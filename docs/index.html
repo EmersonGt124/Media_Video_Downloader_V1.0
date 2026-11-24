@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" class="scroll-smooth">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,101 +11,552 @@
   <meta property="og:image" content="assets/preview_dark.png">
   <link rel="icon" type="image/png" href="assets/icon.png">
 
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-          },
-          colors: {
-            brand: {
-              50: '#f0f9ff',
-              100: '#e0f2fe',
-              400: '#38bdf8',
-              500: '#0ea5e9',
-              600: '#0284c7',
-              700: '#0369a1',
-            },
-            dark: {
-              900: '#090d16',
-              850: '#0d1322',
-              800: '#131b2e',
-              750: '#18223a',
-              700: '#1e293b',
-              600: '#334155',
-            }
-          }
-        }
-      }
-    }
-  </script>
-
+  <!-- Estilos Puros Standalone (100% Resistente a Bloqueadores de Anuncios y Jekyll) -->
   <style>
-    .glow-effect {
-      background: radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.25), transparent 70%);
+    :root {
+      --bg-dark: #0a0f1d;
+      --bg-card: #111827;
+      --bg-card-hover: #1f293d;
+      --border-color: rgba(255, 255, 255, 0.1);
+      --border-hover: rgba(56, 189, 248, 0.4);
+      --primary: #0ea5e9;
+      --primary-hover: #0284c7;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-glow: rgba(14, 165, 233, 0.2);
     }
-    .glass-card {
-      background: rgba(19, 27, 46, 0.7);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
-    .glass-card:hover {
-      border-color: rgba(56, 189, 248, 0.3);
-      box-shadow: 0 10px 30px -10px rgba(14, 165, 233, 0.2);
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* NAVBAR */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10, 15, 29, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      height: 72px;
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+    }
+
+    .brand img {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+    }
+
+    .badge-v {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      background: rgba(14, 165, 233, 0.15);
+      border: 1px solid rgba(14, 165, 233, 0.3);
+      color: var(--primary);
+      border-radius: 9999px;
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      font-size: 0.92rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .nav-links a:hover {
+      color: #fff;
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    /* BOTONES */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 20px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #0ea5e9, #2563eb);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(14, 165, 233, 0.45);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-color);
+      color: #fff;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateY(-2px);
+    }
+
+    /* HERO */
+    .hero {
+      position: relative;
+      padding: 80px 0 60px;
+      text-align: center;
+    }
+
+    .hero-glow {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(14, 165, 233, 0.22) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .pill-hero {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(14, 165, 233, 0.1);
+      border: 1px solid rgba(14, 165, 233, 0.25);
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      color: #38bdf8;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+
+    .pill-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #38bdf8;
+      box-shadow: 0 0 10px #38bdf8;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 4.2rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #38bdf8, #818cf8, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--text-muted);
+      max-width: 760px;
+      margin: 0 auto 36px;
+    }
+
+    .hero-cta {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 50px;
+    }
+
+    /* MOCKUP FRAME */
+    .mockup-frame {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 24px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7);
+    }
+
+    .mockup-frame img {
+      width: 100%;
+      height: auto;
+      border-radius: 16px;
+      display: block;
+    }
+
+    /* TICKER */
+    .platforms {
+      padding: 30px 0;
+      border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      background: rgba(17, 24, 39, 0.4);
+      text-align: center;
+    }
+
+    .platforms p {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .platform-tags {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px 32px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+
+    .platform-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* FEATURES GRID */
+    .section {
+      padding: 90px 0;
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto 56px;
+    }
+
+    .section-tag {
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      color: var(--primary);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .section-title {
+      font-size: clamp(1.8rem, 3.5vw, 2.7rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .section-desc {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 28px;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px -10px var(--accent-glow);
+    }
+
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .card h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* THEME SWITCHER */
+    .theme-switch-wrap {
+      display: inline-flex;
+      background: #090d16;
+      border: 1px solid var(--border-color);
+      padding: 4px;
+      border-radius: 16px;
+      margin-bottom: 32px;
+    }
+
+    .theme-btn {
+      padding: 8px 20px;
+      border-radius: 12px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+
+    .theme-btn.active {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    /* COMPARISON TABLE */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 20px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    th {
+      background: #0d1322;
+      font-weight: 700;
+      color: #cbd5e1;
+    }
+
+    .highlight-col {
+      background: rgba(14, 165, 233, 0.08);
+      font-weight: 700;
+      color: #38bdf8;
+      border-left: 1px solid rgba(14, 165, 233, 0.2);
+      border-right: 1px solid rgba(14, 165, 233, 0.2);
+    }
+
+    /* TERMINAL */
+    .terminal-card {
+      background: #080c14;
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      overflow: hidden;
+      max-width: 820px;
+      margin: 0 auto 40px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .terminal-header {
+      background: #0e1524;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .terminal-body {
+      padding: 24px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.9rem;
+      line-height: 1.7;
+    }
+
+    /* FAQ */
+    .faq-list {
+      max-width: 820px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    details {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px 24px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    details:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    summary {
+      font-weight: 700;
+      font-size: 1.05rem;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details p {
+      margin-top: 12px;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border-color);
+      padding: 40px 0;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+      .hero-cta {
+        flex-direction: column;
+      }
+      .hero-cta .btn {
+        width: 100%;
+      }
     }
   </style>
 </head>
 
-<body class="bg-dark-900 text-slate-100 font-sans antialiased overflow-x-hidden selection:bg-brand-500 selection:text-white">
+<body>
 
   <!-- NAVBAR -->
-  <nav class="sticky top-0 z-50 bg-dark-900/80 backdrop-blur-md border-b border-white/10 transition-all">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-      
-      <!-- Logo -->
-      <a href="#" class="flex items-center gap-3 group">
-        <img src="assets/icon.png" alt="Media Downloader Pro" class="w-10 h-10 rounded-xl shadow-lg shadow-brand-500/20 group-hover:scale-105 transition-transform" />
-        <div>
-          <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-brand-400 bg-clip-text text-transparent">
-            Media Downloader
-          </span>
-          <span class="ml-1 text-xs px-2 py-0.5 font-bold uppercase rounded-full bg-brand-500/20 text-brand-400 border border-brand-500/30">
-            PRO v2.0
-          </span>
-        </div>
+  <nav class="navbar">
+    <div class="container nav-inner">
+      <a href="#" class="brand">
+        <img src="assets/icon.png" alt="Media Downloader Pro" />
+        <span>Media Downloader</span>
+        <span class="badge-v">Pro V2.0</span>
       </a>
 
-      <!-- Desktop Links -->
-      <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
-        <a href="#features" class="hover:text-brand-400 transition-colors">Características</a>
-        <a href="#preview" class="hover:text-brand-400 transition-colors">Capturas</a>
-        <a href="#comparativa" class="hover:text-brand-400 transition-colors">Comparativa</a>
-        <a href="#install" class="hover:text-brand-400 transition-colors">Instalación</a>
-        <a href="#faq" class="hover:text-brand-400 transition-colors">FAQ</a>
+      <div class="nav-links">
+        <a href="#features">Características</a>
+        <a href="#preview">Capturas</a>
+        <a href="#comparativa">Comparativa</a>
+        <a href="#install">Instalación</a>
+        <a href="#faq">FAQ</a>
       </div>
 
-      <!-- Action Buttons -->
-      <div class="flex items-center gap-4">
-        <a href="https://github.com/EmersonGt124/Media_Video_Downloader_V1.0" target="_blank" rel="noopener noreferrer" 
-           class="hidden sm:inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white transition-all hover:scale-105">
-          <i data-lucide="github" class="w-4 h-4"></i>
+      <div class="nav-actions">
+        <a href="https://github.com/EmersonGt124/Media_Video_Downloader_V1.0" target="_blank" class="btn btn-secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
           <span>GitHub</span>
         </a>
-
-        <a href="#install" class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold rounded-xl bg-gradient-to-r from-brand-500 to-blue-600 hover:from-brand-600 hover:to-blue-700 text-white shadow-lg shadow-brand-500/25 transition-all hover:scale-105 active:scale-95">
-          <i data-lucide="download" class="w-4 h-4"></i>
+        <a href="#install" class="btn btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
           <span>Descargar Gratis</span>
         </a>
       </div>
@@ -113,179 +564,151 @@
   </nav>
 
   <!-- HERO SECTION -->
-  <section class="relative pt-16 pb-24 md:pt-28 md:pb-36 glow-effect">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+  <section class="hero">
+    <div class="hero-glow"></div>
+    <div class="container" style="position: relative; z-index: 2;">
       
-      <!-- Announcement Pill -->
-      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 text-xs sm:text-sm font-semibold mb-8 animate-fade-in">
-        <span class="flex h-2 w-2 rounded-full bg-brand-400 animate-pulse"></span>
-        Nueva Versión 2.0 S-Tier • 100% Código Abierto & Sin Publicidad
+      <div class="pill-hero">
+        <span class="pill-dot"></span>
+        <span>Versión 2.0 S-Tier • 100% Código Abierto & Sin Publicidad</span>
       </div>
 
-      <!-- Hero Heading -->
-      <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight max-w-5xl mx-auto leading-[1.15] mb-6">
-        Descarga cualquier video o audio en <span class="bg-gradient-to-r from-brand-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">4K y Máxima Fidelidad</span>
+      <h1>
+        Descarga cualquier video o audio en <br />
+        <span class="gradient-text">4K y Máxima Fidelidad</span>
       </h1>
 
-      <!-- Hero Subtitle -->
-      <p class="text-base sm:text-lg lg:text-xl text-slate-300 max-w-3xl mx-auto mb-10 leading-relaxed">
-        La suite de escritorio definitiva para <strong>YouTube, TikTok, Instagram, Twitter/X, SoundCloud</strong> y +1000 sitios. Con recorte de fragmentos, descargas en paralelo, buscador integrado y conversión real a MP3 a 320 kbps.
+      <p>
+        La suite de escritorio definitiva para <strong>YouTube, TikTok, Instagram, Twitter/X, SoundCloud</strong> y +1000 sitios. Con recorte de fragmentos, descargas paralelas, buscador integrado y conversión real a MP3 a 320 kbps.
       </p>
 
-      <!-- CTA Buttons -->
-      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-        <a href="#install" class="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 text-base font-bold rounded-2xl bg-gradient-to-r from-brand-500 via-blue-600 to-indigo-600 text-white shadow-xl shadow-brand-500/30 hover:shadow-brand-500/50 hover:scale-105 active:scale-95 transition-all">
-          <i data-lucide="download-cloud" class="w-5 h-5"></i>
+      <div class="hero-cta">
+        <a href="#install" class="btn btn-primary" style="padding: 14px 28px; font-size: 1.05rem;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
           <span>Obtener Media Downloader Pro</span>
         </a>
 
-        <a href="https://github.com/EmersonGt124/Media_Video_Downloader_V1.0" target="_blank" class="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 text-base font-semibold rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white transition-all hover:scale-105">
-          <i data-lucide="star" class="w-5 h-5 text-amber-400"></i>
+        <a href="https://github.com/EmersonGt124/Media_Video_Downloader_V1.0" target="_blank" class="btn btn-secondary" style="padding: 14px 28px; font-size: 1.05rem;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
           <span>Dar Estrella en GitHub</span>
         </a>
       </div>
 
-      <!-- App Mockup Preview -->
-      <div class="relative max-w-5xl mx-auto rounded-3xl p-2 sm:p-4 bg-gradient-to-b from-white/15 to-white/5 border border-white/15 shadow-2xl shadow-brand-500/10">
-        <div class="relative overflow-hidden rounded-2xl bg-dark-850 shadow-inner">
-          <img id="hero-preview-img" src="assets/preview_dark.png" alt="Media Downloader Pro Interfaz" class="w-full h-auto rounded-2xl transition-all duration-300 hover:scale-[1.005]" />
-        </div>
+      <!-- APP MOCKUP -->
+      <div class="mockup-frame">
+        <img id="hero-img" src="assets/preview_dark.png" alt="Media Downloader Pro Interfaz" />
       </div>
 
     </div>
   </section>
 
-  <!-- PLATFORMS & COMPATIBILITY BAR -->
-  <section class="py-10 border-y border-white/5 bg-dark-850/60">
-    <div class="max-w-7xl mx-auto px-4 text-center">
-      <p class="text-xs uppercase font-bold tracking-widest text-slate-400 mb-6">
-        Compatible con más de 1.000 plataformas y redes sociales
-      </p>
-      <div class="flex flex-wrap items-center justify-center gap-6 sm:gap-12 opacity-80 text-sm font-semibold text-slate-300">
-        <span class="flex items-center gap-2"><i data-lucide="youtube" class="text-red-500 w-5 h-5"></i> YouTube (4K & Shorts)</span>
-        <span class="flex items-center gap-2"><i data-lucide="music" class="text-cyan-400 w-5 h-5"></i> TikTok (Sin Marca)</span>
-        <span class="flex items-center gap-2"><i data-lucide="instagram" class="text-pink-500 w-5 h-5"></i> Instagram Reels</span>
-        <span class="flex items-center gap-2"><i data-lucide="twitter" class="text-sky-400 w-5 h-5"></i> Twitter / X Clips</span>
-        <span class="flex items-center gap-2"><i data-lucide="facebook" class="text-blue-500 w-5 h-5"></i> Facebook Videos</span>
-        <span class="flex items-center gap-2"><i data-lucide="headphones" class="text-orange-500 w-5 h-5"></i> SoundCloud</span>
-        <span class="flex items-center gap-2"><i data-lucide="tv" class="text-purple-400 w-5 h-5"></i> Twitch Clips</span>
+  <!-- PLATFORMS BAR -->
+  <section class="platforms">
+    <div class="container">
+      <p>Compatible con más de 1.000 plataformas y redes sociales</p>
+      <div class="platform-tags">
+        <span class="platform-item" style="color: #ef4444;">▶ YouTube (4K & Shorts)</span>
+        <span class="platform-item" style="color: #38bdf8;">♫ TikTok (Sin Marca)</span>
+        <span class="platform-item" style="color: #ec4899;">📷 Instagram Reels</span>
+        <span class="platform-item" style="color: #38bdf8;">𝕏 Twitter / X Clips</span>
+        <span class="platform-item" style="color: #3b82f6;">f Facebook Videos</span>
+        <span class="platform-item" style="color: #f97316;">☁ SoundCloud</span>
+        <span class="platform-item" style="color: #a855f7;">👾 Twitch Clips</span>
       </div>
     </div>
   </section>
 
-  <!-- FEATURES GRID -->
-  <section id="features" class="py-24 relative">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <!-- FEATURES -->
+  <section id="features" class="section">
+    <div class="container">
       
-      <div class="text-center max-w-3xl mx-auto mb-16">
-        <span class="text-brand-400 font-bold text-xs uppercase tracking-widest">Nivel Élite S-Tier</span>
-        <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight mt-2 mb-4">
-          Potencia profesional sin anuncios ni límites
-        </h2>
-        <p class="text-slate-400 text-base sm:text-lg">
-          Diseñado con estándares de alto rendimiento para ofrecer la máxima velocidad, fidelidad de audio y control total sobre tus descargas.
-        </p>
+      <div class="section-header">
+        <span class="section-tag">Nivel Élite S-Tier</span>
+        <h2 class="section-title">Potencia profesional sin anuncios ni límites</h2>
+        <p class="section-desc">Diseñado con estándares de alto rendimiento para ofrecer la máxima velocidad, fidelidad de audio y control total sobre tus descargas.</p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="grid-3">
 
-        <!-- Card 1 -->
-        <div class="glass-card rounded-2xl p-7 transition-all">
-          <div class="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-center mb-5">
-            <i data-lucide="film" class="w-6 h-6"></i>
+        <!-- 1 -->
+        <div class="card">
+          <div class="card-icon" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>
           </div>
-          <h3 class="text-xl font-bold mb-2 text-white">Video 4K / 8K a 60 FPS</h3>
-          <p class="text-slate-400 text-sm leading-relaxed">
-            Ensamblado automático con <strong>FFmpeg</strong> de video de ultra alta definición y audio original sin pérdidas de calidad ni compresión destructiva.
-          </p>
+          <h3>Video 4K / 8K a 60 FPS</h3>
+          <p>Ensamblado automático con <strong>FFmpeg</strong> de video en ultra alta definición y audio original sin pérdidas de calidad ni compresión destructiva.</p>
         </div>
 
-        <!-- Card 2 -->
-        <div class="glass-card rounded-2xl p-7 transition-all">
-          <div class="w-12 h-12 rounded-xl bg-brand-500/10 border border-brand-500/20 text-brand-400 flex items-center justify-center mb-5">
-            <i data-lucide="music-2" class="w-6 h-6"></i>
+        <!-- 2 -->
+        <div class="card">
+          <div class="card-icon" style="background: rgba(14, 165, 233, 0.15); color: #0ea5e9;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
           </div>
-          <h3 class="text-xl font-bold mb-2 text-white">MP3 Real (320 kbps) + ID3</h3>
-          <p class="text-slate-400 text-sm leading-relaxed">
-            Conversión de audio real a MP3, M4A, WAV y FLAC. Incrusta automáticamente título, artista, año y <strong>la carátula original en alta resolución</strong>.
-          </p>
+          <h3>MP3 Real (320 kbps) + ID3</h3>
+          <p>Conversión de audio real a MP3, M4A, WAV y FLAC. Incrusta automáticamente título, artista, año y <strong>la carátula original en alta resolución</strong>.</p>
         </div>
 
-        <!-- Card 3 -->
-        <div class="glass-card rounded-2xl p-7 transition-all">
-          <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mb-5">
-            <i data-lucide="scissors" class="w-6 h-6"></i>
+        <!-- 3 -->
+        <div class="card">
+          <div class="card-icon" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>
           </div>
-          <h3 class="text-xl font-bold mb-2 text-white">Recorte por Tiempo (Trim)</h3>
-          <p class="text-slate-400 text-sm leading-relaxed">
-            ¿Solo necesitas el estribillo o un fragmento? Especifica inicio y fin (ej. <code>00:30</code> a <code>02:15</code>) y descarga únicamente esa sección con precisión de fotogramas.
-          </p>
+          <h3>Recorte por Tiempo (Trim)</h3>
+          <p>¿Solo necesitas el estribillo o un fragmento? Especifica inicio y fin (ej. <code>00:30</code> a <code>02:15</code>) y descarga solo esa sección con precisión de fotogramas.</p>
         </div>
 
-        <!-- Card 4 -->
-        <div class="glass-card rounded-2xl p-7 transition-all">
-          <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center mb-5">
-            <i data-lucide="search" class="w-6 h-6"></i>
+        <!-- 4 -->
+        <div class="card">
+          <div class="card-icon" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
           </div>
-          <h3 class="text-xl font-bold mb-2 text-white">Buscador Integrado sin Navegador</h3>
-          <p class="text-slate-400 text-sm leading-relaxed">
-            Busca videos y canciones directamente dentro de la app por palabras clave. Visualiza los mejores resultados y descárgalos con un solo clic.
-          </p>
+          <h3>Buscador Integrado sin Navegador</h3>
+          <p>Busca videos y canciones directamente dentro de la app por palabras clave. Visualiza los mejores resultados y descárgalos con un solo clic.</p>
         </div>
 
-        <!-- Card 5 -->
-        <div class="glass-card rounded-2xl p-7 transition-all">
-          <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mb-5">
-            <i data-lucide="zap" class="w-6 h-6"></i>
+        <!-- 5 -->
+        <div class="card">
+          <div class="card-icon" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
           </div>
-          <h3 class="text-xl font-bold mb-2 text-white">Descargas Paralelas (Hasta 4x)</h3>
-          <p class="text-slate-400 text-sm leading-relaxed">
-            Pool de concurrencia optimizado para descargar hasta 4 archivos simultáneos al vaciar listas o playlists sin saturar el sistema.
-          </p>
+          <h3>Descargas Paralelas (Hasta 4x)</h3>
+          <p>Pool de concurrencia optimizado para descargar hasta 4 archivos simultáneos al vaciar listas o playlists sin saturar el sistema.</p>
         </div>
 
-        <!-- Card 6 -->
-        <div class="glass-card rounded-2xl p-7 transition-all">
-          <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center mb-5">
-            <i data-lucide="shield-check" class="w-6 h-6"></i>
+        <!-- 6 -->
+        <div class="card">
+          <div class="card-icon" style="background: rgba(168, 85, 247, 0.15); color: #a855f7;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
           </div>
-          <h3 class="text-xl font-bold mb-2 text-white">Auto-Recuperación (Error 429)</h3>
-          <p class="text-slate-400 text-sm leading-relaxed">
-            Si YouTube limita los subtítulos con el error <code>HTTP 429</code>, el motor se recupera automáticamente para que tu descarga nunca falle.
-          </p>
+          <h3>Auto-Recuperación (Error 429)</h3>
+          <p>Si YouTube limita los subtítulos con el error <code>HTTP 429</code>, el motor se recupera automáticamente para que tu descarga nunca falle.</p>
         </div>
 
-        <!-- Card 7 -->
-        <div class="glass-card rounded-2xl p-7 transition-all">
-          <div class="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-400 flex items-center justify-center mb-5">
-            <i data-lucide="cookie" class="w-6 h-6"></i>
+        <!-- 7 -->
+        <div class="card">
+          <div class="card-icon" style="background: rgba(249, 115, 22, 0.15); color: #f97316;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
           </div>
-          <h3 class="text-xl font-bold mb-2 text-white">Bypass de Cookies (+18 y Privados)</h3>
-          <p class="text-slate-400 text-sm leading-relaxed">
-            Importa sesiones de Firefox, Chrome, Brave o Edge para descargar videos con restricción de edad o playlists privadas de tu propia cuenta.
-          </p>
+          <h3>Bypass de Cookies (+18 y Privados)</h3>
+          <p>Importa sesiones de Firefox, Chrome, Brave o Edge para descargar videos con restricción de edad o playlists privadas de tu propia cuenta.</p>
         </div>
 
-        <!-- Card 8 -->
-        <div class="glass-card rounded-2xl p-7 transition-all">
-          <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center mb-5">
-            <i data-lucide="play-circle" class="w-6 h-6"></i>
+        <!-- 8 -->
+        <div class="card">
+          <div class="card-icon" style="background: rgba(99, 102, 241, 0.15); color: #6366f1;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
           </div>
-          <h3 class="text-xl font-bold mb-2 text-white">Reproductor Rápido & SQLite</h3>
-          <p class="text-slate-400 text-sm leading-relaxed">
-            Reproduce cualquier archivo descargado con <strong>doble clic</strong> o botón rápido. Historial filtrable por estado y búsqueda en vivo sin archivos Excel pesados.
-          </p>
+          <h3>Reproductor Rápido & SQLite</h3>
+          <p>Reproduce cualquier archivo descargado con <strong>doble clic</strong> o botón rápido. Historial filtrable por estado y búsqueda en vivo.</p>
         </div>
 
-        <!-- Card 9 -->
-        <div class="glass-card rounded-2xl p-7 transition-all">
-          <div class="w-12 h-12 rounded-xl bg-pink-500/10 border border-pink-500/20 text-pink-400 flex items-center justify-center mb-5">
-            <i data-lucide="bell" class="w-6 h-6"></i>
+        <!-- 9 -->
+        <div class="card">
+          <div class="card-icon" style="background: rgba(236, 72, 153, 0.15); color: #ec4899;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
           </div>
-          <h3 class="text-xl font-bold mb-2 text-white">Notificaciones & Auto-Apagado</h3>
-          <p class="text-slate-400 text-sm leading-relaxed">
-            Notificaciones de escritorio al finalizar descargas y opción para suspender el equipo automáticamente tras completar toda la cola.
-          </p>
+          <h3>Notificaciones & Auto-Apagado</h3>
+          <p>Notificaciones de escritorio al finalizar descargas y opción para suspender el equipo automáticamente tras completar toda la cola.</p>
         </div>
 
       </div>
@@ -293,104 +716,90 @@
     </div>
   </section>
 
-  <!-- INTERACTIVE SCREENSHOT GALLERY (DARK / LIGHT TOGGLE) -->
-  <section id="preview" class="py-20 bg-dark-850 border-y border-white/5">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+  <!-- SCREENSHOT GALLERY -->
+  <section id="preview" class="section" style="background: #0d1322; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
+    <div class="container" style="text-align: center;">
       
-      <span class="text-brand-400 font-bold text-xs uppercase tracking-widest">Interfaz Moderna</span>
-      <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight mt-2 mb-6">
-        Diseño Fluent que se adapta a tu flujo
-      </h2>
-      <p class="text-slate-400 max-w-2xl mx-auto text-base sm:text-lg mb-8">
-        Construido con el tema Sun Valley para Tkinter. Soporte completo para alternar entre tema oscuro y claro en tiempo real.
-      </p>
-
-      <!-- Theme Switcher Pills -->
-      <div class="inline-flex p-1 rounded-2xl bg-dark-900 border border-white/10 mb-10">
-        <button id="btn-theme-dark" onclick="switchThemePreview('dark')" class="px-6 py-2.5 rounded-xl font-bold text-sm bg-brand-500 text-white shadow-md transition-all flex items-center gap-2">
-          <i data-lucide="moon" class="w-4 h-4"></i>
-          <span>Modo Oscuro (Dark)</span>
-        </button>
-        <button id="btn-theme-light" onclick="switchThemePreview('light')" class="px-6 py-2.5 rounded-xl font-bold text-sm text-slate-400 hover:text-white transition-all flex items-center gap-2">
-          <i data-lucide="sun" class="w-4 h-4"></i>
-          <span>Modo Claro (Light)</span>
-        </button>
+      <div class="section-header">
+        <span class="section-tag">Diseño Fluent</span>
+        <h2 class="section-title">Interfaz moderna que se adapta a tu flujo</h2>
+        <p class="section-desc">Construido con el tema Sun Valley para Tkinter. Soporte completo para alternar entre tema oscuro y claro en tiempo real.</p>
       </div>
 
-      <!-- Preview Image Display -->
-      <div class="relative max-w-5xl mx-auto rounded-3xl p-2 sm:p-4 bg-gradient-to-b from-white/15 to-white/5 border border-white/10 shadow-2xl">
-        <img id="gallery-preview-img" src="assets/preview_dark.png" alt="Vista previa Media Downloader Pro" class="w-full h-auto rounded-2xl transition-all duration-300" />
+      <div class="theme-switch-wrap">
+        <button id="btn-dark" class="theme-btn active" onclick="cambiarTema('dark')">🌙 Modo Oscuro (Dark)</button>
+        <button id="btn-light" class="theme-btn" onclick="cambiarTema('light')">☀️ Modo Claro (Light)</button>
+      </div>
+
+      <div class="mockup-frame">
+        <img id="gallery-img" src="assets/preview_dark.png" alt="Captura Media Downloader Pro" />
       </div>
 
     </div>
   </section>
 
   <!-- COMPARISON TABLE -->
-  <section id="comparativa" class="py-24">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <section id="comparativa" class="section">
+    <div class="container">
       
-      <div class="text-center max-w-3xl mx-auto mb-16">
-        <span class="text-brand-400 font-bold text-xs uppercase tracking-widest">¿Por qué elegirnos?</span>
-        <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight mt-2 mb-4">
-          Comparativa de Soluciones
-        </h2>
-        <p class="text-slate-400 text-base sm:text-lg">
-          Compara Media Downloader Pro frente a los descargadores web convencionales y las apps comerciales de pago.
-        </p>
+      <div class="section-header">
+        <span class="section-tag">¿Por qué elegirnos?</span>
+        <h2 class="section-title">Comparativa de Soluciones</h2>
+        <p class="section-desc">Compara Media Downloader Pro frente a los descargadores web convencionales y las apps comerciales de pago.</p>
       </div>
 
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse glass-card rounded-2xl overflow-hidden">
+      <div class="table-wrap">
+        <table>
           <thead>
-            <tr class="border-b border-white/10 bg-dark-800/80">
-              <th class="py-5 px-6 text-sm font-bold text-slate-300">Característica</th>
-              <th class="py-5 px-6 text-sm font-bold text-brand-400 bg-brand-500/10 border-x border-brand-500/20">Media Downloader Pro</th>
-              <th class="py-5 px-6 text-sm font-bold text-slate-400">Descargadores Web Clásicos</th>
-              <th class="py-5 px-6 text-sm font-bold text-slate-400">Apps de Pago ($30+)</th>
+            <tr>
+              <th>Característica</th>
+              <th class="highlight-col">Media Downloader Pro</th>
+              <th>Descargadores Web Clásicos</th>
+              <th>Apps de Pago ($30+)</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-white/5 text-sm">
+          <tbody>
             <tr>
-              <td class="py-4 px-6 font-semibold">Resolución Máxima</td>
-              <td class="py-4 px-6 font-bold text-emerald-400 bg-brand-500/5 border-x border-brand-500/20">4K / 8K a 60 FPS</td>
-              <td class="py-4 px-6 text-slate-400">720p (raro 1080p)</td>
-              <td class="py-4 px-6 text-slate-300">4K / 8K</td>
+              <td><strong>Resolución Máxima</strong></td>
+              <td class="highlight-col" style="color: #10b981;">4K / 8K a 60 FPS</td>
+              <td style="color: #94a3b8;">720p (raro 1080p)</td>
+              <td>4K / 8K</td>
             </tr>
             <tr>
-              <td class="py-4 px-6 font-semibold">Publicidad y Malwares</td>
-              <td class="py-4 px-6 font-bold text-emerald-400 bg-brand-500/5 border-x border-brand-500/20">CERO (100% Limpio)</td>
-              <td class="py-4 px-6 text-red-400">Plagado de pop-ups y virus</td>
-              <td class="py-4 px-6 text-slate-300">Sin anuncios</td>
+              <td><strong>Publicidad y Malwares</strong></td>
+              <td class="highlight-col" style="color: #10b981;">CERO (100% Limpio)</td>
+              <td style="color: #ef4444;">Plagado de pop-ups y virus</td>
+              <td>Sin anuncios</td>
             </tr>
             <tr>
-              <td class="py-4 px-6 font-semibold">Conversión Real a MP3</td>
-              <td class="py-4 px-6 font-bold text-emerald-400 bg-brand-500/5 border-x border-brand-500/20">Hasta 320 kbps con FFmpeg</td>
-              <td class="py-4 px-6 text-slate-400">Comprimido a 128 kbps</td>
-              <td class="py-4 px-6 text-slate-300">Hasta 320 kbps</td>
+              <td><strong>Conversión Real a MP3</strong></td>
+              <td class="highlight-col" style="color: #10b981;">Hasta 320 kbps con FFmpeg</td>
+              <td style="color: #94a3b8;">Comprimido a 128 kbps</td>
+              <td>Hasta 320 kbps</td>
             </tr>
             <tr>
-              <td class="py-4 px-6 font-semibold">Incrustación de Carátula y Metadatos ID3</td>
-              <td class="py-4 px-6 font-bold text-emerald-400 bg-brand-500/5 border-x border-brand-500/20">Automático en Alta Res.</td>
-              <td class="py-4 px-6 text-red-400">No soportado</td>
-              <td class="py-4 px-6 text-slate-300">Solo en versión Pro</td>
+              <td><strong>Incrustación de Carátula y Metadatos</strong></td>
+              <td class="highlight-col" style="color: #10b981;">Automático en Alta Res.</td>
+              <td style="color: #ef4444;">No soportado</td>
+              <td>Solo en versión Pro</td>
             </tr>
             <tr>
-              <td class="py-4 px-6 font-semibold">Recorte de Fragmentos (Trim)</td>
-              <td class="py-4 px-6 font-bold text-emerald-400 bg-brand-500/5 border-x border-brand-500/20">Integrado y Preciso</td>
-              <td class="py-4 px-6 text-red-400">No soportado</td>
-              <td class="py-4 px-6 text-red-400">Requiere editor extra</td>
+              <td><strong>Recorte de Fragmentos (Trim)</strong></td>
+              <td class="highlight-col" style="color: #10b981;">Integrado y Preciso</td>
+              <td style="color: #ef4444;">No soportado</td>
+              <td style="color: #ef4444;">Requiere editor extra</td>
             </tr>
             <tr>
-              <td class="py-4 px-6 font-semibold">Descargas Simultáneas en Paralelo</td>
-              <td class="py-4 px-6 font-bold text-emerald-400 bg-brand-500/5 border-x border-brand-500/20">Hasta 4x Hilos Paralelos</td>
-              <td class="py-4 px-6 text-red-400">1 por 1 con tiempos de espera</td>
-              <td class="py-4 px-6 text-slate-300">Soportado</td>
+              <td><strong>Descargas Simultáneas en Paralelo</strong></td>
+              <td class="highlight-col" style="color: #10b981;">Hasta 4x Hilos Paralelos</td>
+              <td style="color: #ef4444;">1 por 1 con esperas</td>
+              <td>Soportado</td>
             </tr>
             <tr>
-              <td class="py-4 px-6 font-semibold">Precio / Licencia</td>
-              <td class="py-4 px-6 font-bold text-emerald-400 bg-brand-500/5 border-x border-brand-500/20">100% Gratis y Open Source</td>
-              <td class="py-4 px-6 text-slate-400">Gratis pero inseguro</td>
-              <td class="py-4 px-6 text-amber-400">Suscripción mensual o $39 USD</td>
+              <td><strong>Precio / Licencia</strong></td>
+              <td class="highlight-col" style="color: #10b981;">100% Gratis y Open Source</td>
+              <td style="color: #94a3b8;">Gratis pero inseguro</td>
+              <td style="color: #f59e0b;">$39 USD o suscripción</td>
             </tr>
           </tbody>
         </table>
@@ -399,187 +808,150 @@
     </div>
   </section>
 
-  <!-- QUICKSTART / INSTALLATION -->
-  <section id="install" class="py-24 bg-dark-850 border-y border-white/5">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <!-- INSTALLATION -->
+  <section id="install" class="section" style="background: #0d1322; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
+    <div class="container">
       
-      <div class="text-center max-w-3xl mx-auto mb-16">
-        <span class="text-brand-400 font-bold text-xs uppercase tracking-widest">Ejecución Inmediata</span>
-        <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight mt-2 mb-4">
-          Comienza en 3 sencillos pasos
-        </h2>
-        <p class="text-slate-400 text-base sm:text-lg">
-          Compatible con Linux (Garuda/Arch, Ubuntu/Debian, Fedora), Windows 10/11 y macOS.
-        </p>
+      <div class="section-header">
+        <span class="section-tag">Ejecución Inmediata</span>
+        <h2 class="section-title">Comienza en 3 sencillos pasos</h2>
+        <p class="section-desc">Compatible de forma nativa con Linux (Garuda/Arch, Ubuntu, Debian), Windows 10/11 y macOS.</p>
       </div>
 
-      <!-- Terminal Card -->
-      <div class="max-w-3xl mx-auto glass-card rounded-2xl overflow-hidden border border-white/10 shadow-2xl mb-12">
-        <div class="bg-dark-900 px-6 py-4 border-b border-white/10 flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <span class="w-3 h-3 rounded-full bg-red-500/80"></span>
-            <span class="w-3 h-3 rounded-full bg-amber-500/80"></span>
-            <span class="w-3 h-3 rounded-full bg-emerald-500/80"></span>
-            <span class="ml-2 text-xs font-mono text-slate-400">Terminal / Bash / PowerShell</span>
+      <div class="terminal-card">
+        <div class="terminal-header">
+          <div class="dots">
+            <span class="dot" style="background: #ef4444;"></span>
+            <span class="dot" style="background: #f59e0b;"></span>
+            <span class="dot" style="background: #10b981;"></span>
           </div>
-          <button onclick="copySnippet()" class="text-xs text-brand-400 hover:text-brand-300 font-semibold flex items-center gap-1.5 transition-colors">
-            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
-            <span id="copy-text">Copiar comandos</span>
+          <button onclick="copiarComando()" class="btn btn-secondary" style="padding: 4px 12px; font-size: 0.78rem;">
+            <span id="copy-label">Copiar comandos</span>
           </button>
         </div>
-
-        <div class="p-6 font-mono text-xs sm:text-sm text-slate-200 overflow-x-auto leading-relaxed">
-          <p class="text-slate-500"># 1. Clona el repositorio</p>
-          <p class="text-emerald-400">git clone https://github.com/EmersonGt124/Media_Video_Downloader_V1.0.git</p>
-          <p class="text-slate-500 mt-3"># 2. Entra a la carpeta e instala dependencias</p>
-          <p class="text-emerald-400">cd Media_Video_Downloader_V1.0 && pip install pillow sv-ttk</p>
-          <p class="text-slate-500 mt-3"># 3. Inicia la aplicación (¡yt-dlp viene preconfigurado!)</p>
-          <p class="text-emerald-400">cd PROYECTO && python3 Media_Downloader.py</p>
+        <div class="terminal-body">
+          <p style="color: #64748b;"># 1. Clona el repositorio</p>
+          <p style="color: #38bdf8;">git clone https://github.com/EmersonGt124/Media_Video_Downloader_V1.0.git</p>
+          <p style="color: #64748b; margin-top: 12px;"># 2. Entra a la carpeta e instala dependencias</p>
+          <p style="color: #38bdf8;">cd Media_Video_Downloader_V1.0 && pip install pillow sv-ttk</p>
+          <p style="color: #64748b; margin-top: 12px;"># 3. Inicia la aplicación (yt-dlp viene incluido)</p>
+          <p style="color: #10b981; font-weight: 700;">cd PROYECTO && python3 Media_Downloader.py</p>
         </div>
       </div>
 
-      <!-- OS Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-        <div class="p-6 rounded-2xl bg-dark-900 border border-white/5 text-center">
-          <i data-lucide="terminal" class="w-10 h-10 mx-auto text-brand-400 mb-4"></i>
-          <h4 class="font-bold text-lg mb-2">Linux</h4>
-          <p class="text-xs text-slate-400 mb-4">Arch, Garuda, Ubuntu, Debian, Fedora. Requiere <code>ffmpeg</code> del gestor de paquetes.</p>
-          <code class="text-xs text-emerald-400 bg-dark-800 px-3 py-1.5 rounded-lg block">sudo pacman -S ffmpeg</code>
+      <div class="grid-3" style="max-width: 960px; margin: 0 auto;">
+        <div class="card" style="text-align: center; align-items: center;">
+          <h4 style="font-size: 1.15rem; margin-bottom: 6px;">🐧 Linux</h4>
+          <p style="font-size: 0.85rem; margin-bottom: 12px;">Arch, Garuda, Ubuntu, Debian, Fedora. Requiere <code>ffmpeg</code>.</p>
+          <code style="background: #080c14; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; color: #10b981;">sudo pacman -S ffmpeg</code>
         </div>
-
-        <div class="p-6 rounded-2xl bg-dark-900 border border-white/5 text-center">
-          <i data-lucide="layout" class="w-10 h-10 mx-auto text-sky-400 mb-4"></i>
-          <h4 class="font-bold text-lg mb-2">Windows 10 / 11</h4>
-          <p class="text-xs text-slate-400 mb-4">Soporta modo claro y oscuro nativo con Fluent UI y notificaciones toast.</p>
-          <code class="text-xs text-sky-400 bg-dark-800 px-3 py-1.5 rounded-lg block">winget install Gyan.FFmpeg</code>
+        <div class="card" style="text-align: center; align-items: center;">
+          <h4 style="font-size: 1.15rem; margin-bottom: 6px;">🪟 Windows 10 / 11</h4>
+          <p style="font-size: 0.85rem; margin-bottom: 12px;">Soporta Fluent UI modo oscuro y notificaciones toast.</p>
+          <code style="background: #080c14; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; color: #38bdf8;">winget install Gyan.FFmpeg</code>
         </div>
-
-        <div class="p-6 rounded-2xl bg-dark-900 border border-white/5 text-center">
-          <i data-lucide="apple" class="w-10 h-10 mx-auto text-slate-300 mb-4"></i>
-          <h4 class="font-bold text-lg mb-2">macOS</h4>
-          <p class="text-xs text-slate-400 mb-4">Compatible con arquitecturas Apple Silicon M1/M2/M3 e Intel.</p>
-          <code class="text-xs text-slate-300 bg-dark-800 px-3 py-1.5 rounded-lg block">brew install ffmpeg</code>
+        <div class="card" style="text-align: center; align-items: center;">
+          <h4 style="font-size: 1.15rem; margin-bottom: 6px;">🍎 macOS</h4>
+          <p style="font-size: 0.85rem; margin-bottom: 12px;">Compatible con Apple Silicon M1/M2/M3 e Intel.</p>
+          <code style="background: #080c14; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; color: #cbd5e1;">brew install ffmpeg</code>
         </div>
       </div>
 
     </div>
   </section>
 
-  <!-- FAQ SECTION -->
-  <section id="faq" class="py-24">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+  <!-- FAQ -->
+  <section id="faq" class="section">
+    <div class="container">
       
-      <div class="text-center mb-16">
-        <span class="text-brand-400 font-bold text-xs uppercase tracking-widest">Preguntas Frecuentes</span>
-        <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight mt-2 mb-4">
-          Resolvemos tus dudas
-        </h2>
+      <div class="section-header">
+        <span class="section-tag">Preguntas Frecuentes</span>
+        <h2 class="section-title">Resolvemos tus dudas</h2>
       </div>
 
-      <div class="space-y-4">
-
-        <details class="glass-card rounded-2xl p-6 group cursor-pointer">
-          <summary class="font-bold text-lg text-white flex items-center justify-between list-none">
+      <div class="faq-list">
+        <details>
+          <summary>
             <span>¿Es 100% gratuito y sin publicidad?</span>
-            <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform"></i>
+            <span>▼</span>
           </summary>
-          <p class="mt-4 text-slate-400 text-sm leading-relaxed">
-            Sí. Es un proyecto de código abierto bajo la licencia Mozilla Public License 2.0. No contiene malware, rastreadores ni anuncios de ningún tipo.
-          </p>
+          <p>Sí. Es un proyecto de código abierto bajo la licencia Mozilla Public License 2.0. No contiene malware, rastreadores ni anuncios de ningún tipo.</p>
         </details>
 
-        <details class="glass-card rounded-2xl p-6 group cursor-pointer">
-          <summary class="font-bold text-lg text-white flex items-center justify-between list-none">
+        <details>
+          <summary>
             <span>¿Cómo funciona la tolerancia al Error 429 de YouTube?</span>
-            <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform"></i>
+            <span>▼</span>
           </summary>
-          <p class="mt-4 text-slate-400 text-sm leading-relaxed">
-            YouTube limita las peticiones automáticas a la API de subtítulos con el código HTTP 429. Si esto ocurre, el motor detecta la anomalía al instante y descarga el video completo con su carátula sin abortar el proceso, informándote de manera amigable.
-          </p>
+          <p>YouTube suele limitar peticiones automáticas de subtítulos con el error HTTP 429. Si esto ocurre, el motor se auto-recupera de inmediato y descarga el video completo con su carátula sin cancelar la tarea, informándote amigablemente.</p>
         </details>
 
-        <details class="glass-card rounded-2xl p-6 group cursor-pointer">
-          <summary class="font-bold text-lg text-white flex items-center justify-between list-none">
+        <details>
+          <summary>
             <span>¿Qué formatos de audio y video están soportados?</span>
-            <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform"></i>
+            <span>▼</span>
           </summary>
-          <p class="mt-4 text-slate-400 text-sm leading-relaxed">
-            Para video: MP4 (con calidades desde 360p hasta 4K/8K a 60 FPS). Para audio: MP3 (320 kbps, 256 kbps, 192 kbps), M4A, WAV y FLAC sin pérdidas.
-          </p>
+          <p>Para video: MP4 (con calidades desde 360p hasta 4K/8K a 60 FPS). Para audio: MP3 (320 kbps, 256 kbps, 192 kbps), M4A, WAV y FLAC sin pérdidas.</p>
         </details>
 
-        <details class="glass-card rounded-2xl p-6 group cursor-pointer">
-          <summary class="font-bold text-lg text-white flex items-center justify-between list-none">
+        <details>
+          <summary>
             <span>¿Puedo descargar playlists completas de una sola vez?</span>
-            <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform"></i>
+            <span>▼</span>
           </summary>
-          <p class="mt-4 text-slate-400 text-sm leading-relaxed">
-            Sí. Al pegar un enlace de una playlist, el programa detecta todos los videos automáticamente y te pregunta si deseas agregarlos a la cola para descargarlos todos desatendidamente o en paralelo (hasta 4x simultáneos).
-          </p>
+          <p>Sí. Al pegar el enlace de una lista de reproducción, el programa detecta todos los videos y te permite agregarlos a la cola para descargarlos todos desatendidamente o en paralelo (hasta 4x simultáneos).</p>
         </details>
-
       </div>
 
     </div>
   </section>
 
   <!-- FOOTER -->
-  <footer class="py-12 border-t border-white/10 bg-dark-900 text-slate-400 text-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
-      
-      <div class="flex items-center gap-3">
-        <img src="assets/icon.png" alt="Media Downloader Logo" class="w-7 h-7 rounded-lg" />
-        <span class="font-bold text-white">Media Downloader Pro</span>
-        <span class="text-xs text-slate-500">• Licencia MPL 2.0</span>
+  <footer>
+    <div class="container footer-inner">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <img src="assets/icon.png" width="28" height="28" style="border-radius: 6px;" alt="Icon" />
+        <strong style="color: #fff;">Media Downloader Pro</strong>
+        <span>• Licencia MPL 2.0</span>
       </div>
 
-      <div class="flex items-center gap-6">
-        <a href="#features" class="hover:text-white transition-colors">Características</a>
-        <a href="#install" class="hover:text-white transition-colors">Instalación</a>
-        <a href="https://github.com/EmersonGt124/Media_Video_Downloader_V1.0" target="_blank" class="hover:text-white transition-colors flex items-center gap-1.5">
-          <i data-lucide="github" class="w-4 h-4"></i>
-          <span>GitHub</span>
-        </a>
+      <div style="display: flex; gap: 20px;">
+        <a href="#features">Características</a>
+        <a href="#install">Instalación</a>
+        <a href="https://github.com/EmersonGt124/Media_Video_Downloader_V1.0" target="_blank" style="color: #38bdf8;">GitHub Repository</a>
       </div>
 
-      <p class="text-xs text-slate-500">
-        Desarrollado con Python, yt-dlp, FFmpeg, SQLite y sv-ttk.
-      </p>
-
+      <p style="font-size: 0.8rem;">Desarrollado con Python, yt-dlp, FFmpeg, SQLite y sv-ttk.</p>
     </div>
   </footer>
 
-  <!-- SCRIPT FOR INTERACTION -->
   <script>
-    lucide.createIcons();
+    function cambiarTema(tema) {
+      const hero = document.getElementById('hero-img');
+      const gallery = document.getElementById('gallery-img');
+      const btnDark = document.getElementById('btn-dark');
+      const btnLight = document.getElementById('btn-light');
 
-    function switchThemePreview(theme) {
-      const heroImg = document.getElementById('hero-preview-img');
-      const galleryImg = document.getElementById('gallery-preview-img');
-      const btnDark = document.getElementById('btn-theme-dark');
-      const btnLight = document.getElementById('btn-theme-light');
+      const src = tema === 'dark' ? 'assets/preview_dark.png' : 'assets/preview_light.png';
+      if (hero) hero.src = src;
+      if (gallery) gallery.src = src;
 
-      const src = theme === 'dark' ? 'assets/preview_dark.png' : 'assets/preview_light.png';
-      
-      if (heroImg) heroImg.src = src;
-      if (galleryImg) galleryImg.src = src;
-
-      if (theme === 'dark') {
-        btnDark.className = 'px-6 py-2.5 rounded-xl font-bold text-sm bg-brand-500 text-white shadow-md transition-all flex items-center gap-2';
-        btnLight.className = 'px-6 py-2.5 rounded-xl font-bold text-sm text-slate-400 hover:text-white transition-all flex items-center gap-2';
+      if (tema === 'dark') {
+        btnDark.classList.add('active');
+        btnLight.classList.remove('active');
       } else {
-        btnLight.className = 'px-6 py-2.5 rounded-xl font-bold text-sm bg-brand-500 text-white shadow-md transition-all flex items-center gap-2';
-        btnDark.className = 'px-6 py-2.5 rounded-xl font-bold text-sm text-slate-400 hover:text-white transition-all flex items-center gap-2';
+        btnLight.classList.add('active');
+        btnDark.classList.remove('active');
       }
     }
 
-    function copySnippet() {
-      const snippet = "git clone https://github.com/EmersonGt124/Media_Video_Downloader_V1.0.git && cd Media_Video_Downloader_V1.0 && pip install pillow sv-ttk && cd PROYECTO && python3 Media_Downloader.py";
-      navigator.clipboard.writeText(snippet).then(() => {
-        const copyText = document.getElementById('copy-text');
-        copyText.textContent = "¡Copiado!";
+    function copiarComando() {
+      const code = "git clone https://github.com/EmersonGt124/Media_Video_Downloader_V1.0.git && cd Media_Video_Downloader_V1.0 && pip install pillow sv-ttk && cd PROYECTO && python3 Media_Downloader.py";
+      navigator.clipboard.writeText(code).then(() => {
+        const lbl = document.getElementById('copy-label');
+        lbl.innerText = "¡Copiado!";
         setTimeout(() => {
-          copyText.textContent = "Copiar comandos";
+          lbl.innerText = "Copiar comandos";
         }, 2000);
       });
     }
