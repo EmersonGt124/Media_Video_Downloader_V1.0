@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Media Downloader Pro — Descarga Videos en 4K y Audio de Alta Fidelidad</title>
+  
+  <meta name="description" content="Suite de escritorio moderna, rápida y de código abierto para descargar videos y música en 4K/8K y MP3 a 320kbps desde YouTube, TikTok, Instagram, Twitter y +1000 sitios.">
+  <meta property="og:title" content="Media Downloader Pro — Descargador Multimedia Definitivo">
+  <meta property="og:description" content="Descarga videos en 4K, audio en MP3 real a 320kbps con metadatos ID3, recorte por tiempo y descargas paralelas. 100% Gratis y Open Source.">
+  <meta property="og:image" content="assets/preview_dark.png">
+  <link rel="icon" type="image/png" href="assets/icon.png">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+            },
+            dark: {
+              900: '#090d16',
+              850: '#0d1322',
+              800: '#131b2e',
+              750: '#18223a',
+              700: '#1e293b',
+              600: '#334155',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .glow-effect {
+      background: radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.25), transparent 70%);
+    }
+    .glass-card {
+      background: rgba(19, 27, 46, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card:hover {
+      border-color: rgba(56, 189, 248, 0.3);
+      box-shadow: 0 10px 30px -10px rgba(14, 165, 233, 0.2);
+    }
+  </style>
+</head>
+
+<body class="bg-dark-900 text-slate-100 font-sans antialiased overflow-x-hidden selection:bg-brand-500 selection:text-white">
+
+  <!-- NAVBAR -->
+  <nav class="sticky top-0 z-50 bg-dark-900/80 backdrop-blur-md border-b border-white/10 transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Logo -->
+      <a href="#" class="flex items-center gap-3 group">
+        <img src="assets/icon.png" alt="Media Downloader Pro" class="w-10 h-10 rounded-xl shadow-lg shadow-brand-500/20 group-hover:scale-105 transition-transform" />
+        <div>
+          <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-brand-400 bg-clip-text text-transparent">
+            Media Downloader
+          </span>
+          <span class="ml-1 text-xs px-2 py-0.5 font-bold uppercase rounded-full bg-brand-500/20 text-brand-400 border border-brand-500/30">
+            PRO v2.0
+          </span>
+        </div>
+      </a>
+
+      <!-- Desktop Links -->
+      <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+        <a href="#features" class="hover:text-brand-400 transition-colors">Características</a>
+        <a href="#preview" class="hover:text-brand-400 transition-colors">Capturas</a>
+        <a href="#comparativa" class="hover:text-brand-400 transition-colors">Comparativa</a>
+        <a href="#install" class="hover:text-brand-400 transition-colors">Instalación</a>
+        <a href="#faq" class="hover:text-brand-400 transition-colors">FAQ</a>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-4">
+        <a href="https://github.com/emerson199818/Media_Video_Downloader_V1.0" target="_blank" rel="noopener noreferrer" 
+           class="hidden sm:inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white transition-all hover:scale-105">
+          <i data-lucide="github" class="w-4 h-4"></i>
+          <span>GitHub</span>
+        </a>
+
+        <a href="#install" class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold rounded-xl bg-gradient-to-r from-brand-500 to-blue-600 hover:from-brand-600 hover:to-blue-700 text-white shadow-lg shadow-brand-500/25 transition-all hover:scale-105 active:scale-95">
+          <i data-lucide="download" class="w-4 h-4"></i>
+          <span>Descargar Gratis</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section class="relative pt-16 pb-24 md:pt-28 md:pb-36 glow-effect">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+      
+      <!-- Announcement Pill -->
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 text-xs sm:text-sm font-semibold mb-8 animate-fade-in">
+        <span class="flex h-2 w-2 rounded-full bg-brand-400 animate-pulse"></span>
+        Nueva Versión 2.0 S-Tier • 100% Código Abierto & Sin Publicidad
+      </div>
+
+      <!-- Hero Heading -->
+      <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight max-w-5xl mx-auto leading-[1.15] mb-6">
+        Descarga cualquier video o audio en <span class="bg-gradient-to-r from-brand-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">4K y Máxima Fidelidad</span>
+      </h1>
+
+      <!-- Hero Subtitle -->
+      <p class="text-base sm:text-lg lg:text-xl text-slate-300 max-w-3xl mx-auto mb-10 leading-relaxed">
+        La suite de escritorio definitiva para <strong>YouTube, TikTok, Instagram, Twitter/X, SoundCloud</strong> y +1000 sitios. Con recorte de fragmentos, descargas en paralelo, buscador integrado y conversión real a MP3 a 320 kbps.
+      </p>
+
+      <!-- CTA Buttons -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+        <a href="#install" class="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 text-base font-bold rounded-2xl bg-gradient-to-r from-brand-500 via-blue-600 to-indigo-600 text-white shadow-xl shadow-brand-500/30 hover:shadow-brand-500/50 hover:scale-105 active:scale-95 transition-all">
+          <i data-lucide="download-cloud" class="w-5 h-5"></i>
+          <span>Obtener Media Downloader Pro</span>
+        </a>
+
+        <a href="https://github.com/emerson199818/Media_Video_Downloader_V1.0" target="_blank" class="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 text-base font-semibold rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white transition-all hover:scale-105">
+          <i data-lucide="star" class="w-5 h-5 text-amber-400"></i>
+          <span>Dar Estrella en GitHub</span>
+        </a>
+      </div>
+
+      <!-- App Mockup Preview -->
+      <div class="relative max-w-5xl mx-auto rounded-3xl p-2 sm:p-4 bg-gradient-to-b from-white/15 to-white/5 border border-white/15 shadow-2xl shadow-brand-500/10">
+        <div class="relative overflow-hidden rounded-2xl bg-dark-850 shadow-inner">
+          <img id="hero-preview-img" src="assets/preview_dark.png" alt="Media Downloader Pro Interfaz" class="w-full h-auto rounded-2xl transition-all duration-300 hover:scale-[1.005]" />
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PLATFORMS & COMPATIBILITY BAR -->
+  <section class="py-10 border-y border-white/5 bg-dark-850/60">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+      <p class="text-xs uppercase font-bold tracking-widest text-slate-400 mb-6">
+        Compatible con más de 1.000 plataformas y redes sociales
+      </p>
+      <div class="flex flex-wrap items-center justify-center gap-6 sm:gap-12 opacity-80 text-sm font-semibold text-slate-300">
+        <span class="flex items-center gap-2"><i data-lucide="youtube" class="text-red-500 w-5 h-5"></i> YouTube (4K & Shorts)</span>
+        <span class="flex items-center gap-2"><i data-lucide="music" class="text-cyan-400 w-5 h-5"></i> TikTok (Sin Marca)</span>
+        <span class="flex items-center gap-2"><i data-lucide="instagram" class="text-pink-500 w-5 h-5"></i> Instagram Reels</span>
+        <span class="flex items-center gap-2"><i data-lucide="twitter" class="text-sky-400 w-5 h-5"></i> Twitter / X Clips</span>
+        <span class="flex items-center gap-2"><i data-lucide="facebook" class="text-blue-500 w-5 h-5"></i> Facebook Videos</span>
+        <span class="flex items-center gap-2"><i data-lucide="headphones" class="text-orange-500 w-5 h-5"></i> SoundCloud</span>
+        <span class="flex items-center gap-2"><i data-lucide="tv" class="text-purple-400 w-5 h-5"></i> Twitch Clips</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES GRID -->
+  <section id="features" class="py-24 relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="text-brand-400 font-bold text-xs uppercase tracking-widest">Nivel Élite S-Tier</span>
+        <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight mt-2 mb-4">
+          Potencia profesional sin anuncios ni límites
+        </h2>
+        <p class="text-slate-400 text-base sm:text-lg">
+          Diseñado con estándares de alto rendimiento para ofrecer la máxima velocidad, fidelidad de audio y control total sobre tus descargas.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <!-- Card 1 -->
+        <div class="glass-card rounded-2xl p-7 transition-all">
+          <div class="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-center mb-5">
+            <i data-lucide="film" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold mb-2 text-white">Video 4K / 8K a 60 FPS</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            Ensamblado automático con <strong>FFmpeg</strong> de video de ultra alta definición y audio original sin pérdidas de calidad ni compresión destructiva.
+          </p>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="glass-card rounded-2xl p-7 transition-all">
+          <div class="w-12 h-12 rounded-xl bg-brand-500/10 border border-brand-500/20 text-brand-400 flex items-center justify-center mb-5">
+            <i data-lucide="music-2" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold mb-2 text-white">MP3 Real (320 kbps) + ID3</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            Conversión de audio real a MP3, M4A, WAV y FLAC. Incrusta automáticamente título, artista, año y <strong>la carátula original en alta resolución</strong>.
+          </p>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="glass-card rounded-2xl p-7 transition-all">
+          <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mb-5">
+            <i data-lucide="scissors" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold mb-2 text-white">Recorte por Tiempo (Trim)</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            ¿Solo necesitas el estribillo o un fragmento? Especifica inicio y fin (ej. <code>00:30</code> a <code>02:15</code>) y descarga únicamente esa sección con precisión de fotogramas.
+          </p>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="glass-card rounded-2xl p-7 transition-all">
+          <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center mb-5">
+            <i data-lucide="search" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold mb-2 text-white">Buscador Integrado sin Navegador</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            Busca videos y canciones directamente dentro de la app por palabras clave. Visualiza los mejores resultados y descárgalos con un solo clic.
+          </p>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="glass-card rounded-2xl p-7 transition-all">
+          <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mb-5">
+            <i data-lucide="zap" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold mb-2 text-white">Descargas Paralelas (Hasta 4x)</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            Pool de concurrencia optimizado para descargar hasta 4 archivos simultáneos al vaciar listas o playlists sin saturar el sistema.
+          </p>
+        </div>
+
+        <!-- Card 6 -->
+        <div class="glass-card rounded-2xl p-7 transition-all">
+          <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center mb-5">
+            <i data-lucide="shield-check" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold mb-2 text-white">Auto-Recuperación (Error 429)</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            Si YouTube limita los subtítulos con el error <code>HTTP 429</code>, el motor se recupera automáticamente para que tu descarga nunca falle.
+          </p>
+        </div>
+
+        <!-- Card 7 -->
+        <div class="glass-card rounded-2xl p-7 transition-all">
+          <div class="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-400 flex items-center justify-center mb-5">
+            <i data-lucide="cookie" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold mb-2 text-white">Bypass de Cookies (+18 y Privados)</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            Importa sesiones de Firefox, Chrome, Brave o Edge para descargar videos con restricción de edad o playlists privadas de tu propia cuenta.
+          </p>
+        </div>
+
+        <!-- Card 8 -->
+        <div class="glass-card rounded-2xl p-7 transition-all">
+          <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center mb-5">
+            <i data-lucide="play-circle" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold mb-2 text-white">Reproductor Rápido & SQLite</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            Reproduce cualquier archivo descargado con <strong>doble clic</strong> o botón rápido. Historial filtrable por estado y búsqueda en vivo sin archivos Excel pesados.
+          </p>
+        </div>
+
+        <!-- Card 9 -->
+        <div class="glass-card rounded-2xl p-7 transition-all">
+          <div class="w-12 h-12 rounded-xl bg-pink-500/10 border border-pink-500/20 text-pink-400 flex items-center justify-center mb-5">
+            <i data-lucide="bell" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold mb-2 text-white">Notificaciones & Auto-Apagado</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            Notificaciones de escritorio al finalizar descargas y opción para suspender el equipo automáticamente tras completar toda la cola.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- INTERACTIVE SCREENSHOT GALLERY (DARK / LIGHT TOGGLE) -->
+  <section id="preview" class="py-20 bg-dark-850 border-y border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      
+      <span class="text-brand-400 font-bold text-xs uppercase tracking-widest">Interfaz Moderna</span>
+      <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight mt-2 mb-6">
+        Diseño Fluent que se adapta a tu flujo
+      </h2>
+      <p class="text-slate-400 max-w-2xl mx-auto text-base sm:text-lg mb-8">
+        Construido con el tema Sun Valley para Tkinter. Soporte completo para alternar entre tema oscuro y claro en tiempo real.
+      </p>
+
+      <!-- Theme Switcher Pills -->
+      <div class="inline-flex p-1 rounded-2xl bg-dark-900 border border-white/10 mb-10">
+        <button id="btn-theme-dark" onclick="switchThemePreview('dark')" class="px-6 py-2.5 rounded-xl font-bold text-sm bg-brand-500 text-white shadow-md transition-all flex items-center gap-2">
+          <i data-lucide="moon" class="w-4 h-4"></i>
+          <span>Modo Oscuro (Dark)</span>
+        </button>
+        <button id="btn-theme-light" onclick="switchThemePreview('light')" class="px-6 py-2.5 rounded-xl font-bold text-sm text-slate-400 hover:text-white transition-all flex items-center gap-2">
+          <i data-lucide="sun" class="w-4 h-4"></i>
+          <span>Modo Claro (Light)</span>
+        </button>
+      </div>
+
+      <!-- Preview Image Display -->
+      <div class="relative max-w-5xl mx-auto rounded-3xl p-2 sm:p-4 bg-gradient-to-b from-white/15 to-white/5 border border-white/10 shadow-2xl">
+        <img id="gallery-preview-img" src="assets/preview_dark.png" alt="Vista previa Media Downloader Pro" class="w-full h-auto rounded-2xl transition-all duration-300" />
+      </div>
+
+    </div>
+  </section>
+
+  <!-- COMPARISON TABLE -->
+  <section id="comparativa" class="py-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="text-brand-400 font-bold text-xs uppercase tracking-widest">¿Por qué elegirnos?</span>
+        <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight mt-2 mb-4">
+          Comparativa de Soluciones
+        </h2>
+        <p class="text-slate-400 text-base sm:text-lg">
+          Compara Media Downloader Pro frente a los descargadores web convencionales y las apps comerciales de pago.
+        </p>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse glass-card rounded-2xl overflow-hidden">
+          <thead>
+            <tr class="border-b border-white/10 bg-dark-800/80">
+              <th class="py-5 px-6 text-sm font-bold text-slate-300">Característica</th>
+              <th class="py-5 px-6 text-sm font-bold text-brand-400 bg-brand-500/10 border-x border-brand-500/20">Media Downloader Pro</th>
+              <th class="py-5 px-6 text-sm font-bold text-slate-400">Descargadores Web Clásicos</th>
+              <th class="py-5 px-6 text-sm font-bold text-slate-400">Apps de Pago ($30+)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5 text-sm">
+            <tr>
+              <td class="py-4 px-6 font-semibold">Resolución Máxima</td>
+              <td class="py-4 px-6 font-bold text-emerald-400 bg-brand-500/5 border-x border-brand-500/20">4K / 8K a 60 FPS</td>
+              <td class="py-4 px-6 text-slate-400">720p (raro 1080p)</td>
+              <td class="py-4 px-6 text-slate-300">4K / 8K</td>
+            </tr>
+            <tr>
+              <td class="py-4 px-6 font-semibold">Publicidad y Malwares</td>
+              <td class="py-4 px-6 font-bold text-emerald-400 bg-brand-500/5 border-x border-brand-500/20">CERO (100% Limpio)</td>
+              <td class="py-4 px-6 text-red-400">Plagado de pop-ups y virus</td>
+              <td class="py-4 px-6 text-slate-300">Sin anuncios</td>
+            </tr>
+            <tr>
+              <td class="py-4 px-6 font-semibold">Conversión Real a MP3</td>
+              <td class="py-4 px-6 font-bold text-emerald-400 bg-brand-500/5 border-x border-brand-500/20">Hasta 320 kbps con FFmpeg</td>
+              <td class="py-4 px-6 text-slate-400">Comprimido a 128 kbps</td>
+              <td class="py-4 px-6 text-slate-300">Hasta 320 kbps</td>
+            </tr>
+            <tr>
+              <td class="py-4 px-6 font-semibold">Incrustación de Carátula y Metadatos ID3</td>
+              <td class="py-4 px-6 font-bold text-emerald-400 bg-brand-500/5 border-x border-brand-500/20">Automático en Alta Res.</td>
+              <td class="py-4 px-6 text-red-400">No soportado</td>
+              <td class="py-4 px-6 text-slate-300">Solo en versión Pro</td>
+            </tr>
+            <tr>
+              <td class="py-4 px-6 font-semibold">Recorte de Fragmentos (Trim)</td>
+              <td class="py-4 px-6 font-bold text-emerald-400 bg-brand-500/5 border-x border-brand-500/20">Integrado y Preciso</td>
+              <td class="py-4 px-6 text-red-400">No soportado</td>
+              <td class="py-4 px-6 text-red-400">Requiere editor extra</td>
+            </tr>
+            <tr>
+              <td class="py-4 px-6 font-semibold">Descargas Simultáneas en Paralelo</td>
+              <td class="py-4 px-6 font-bold text-emerald-400 bg-brand-500/5 border-x border-brand-500/20">Hasta 4x Hilos Paralelos</td>
+              <td class="py-4 px-6 text-red-400">1 por 1 con tiempos de espera</td>
+              <td class="py-4 px-6 text-slate-300">Soportado</td>
+            </tr>
+            <tr>
+              <td class="py-4 px-6 font-semibold">Precio / Licencia</td>
+              <td class="py-4 px-6 font-bold text-emerald-400 bg-brand-500/5 border-x border-brand-500/20">100% Gratis y Open Source</td>
+              <td class="py-4 px-6 text-slate-400">Gratis pero inseguro</td>
+              <td class="py-4 px-6 text-amber-400">Suscripción mensual o $39 USD</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- QUICKSTART / INSTALLATION -->
+  <section id="install" class="py-24 bg-dark-850 border-y border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="text-brand-400 font-bold text-xs uppercase tracking-widest">Ejecución Inmediata</span>
+        <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight mt-2 mb-4">
+          Comienza en 3 sencillos pasos
+        </h2>
+        <p class="text-slate-400 text-base sm:text-lg">
+          Compatible con Linux (Garuda/Arch, Ubuntu/Debian, Fedora), Windows 10/11 y macOS.
+        </p>
+      </div>
+
+      <!-- Terminal Card -->
+      <div class="max-w-3xl mx-auto glass-card rounded-2xl overflow-hidden border border-white/10 shadow-2xl mb-12">
+        <div class="bg-dark-900 px-6 py-4 border-b border-white/10 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-red-500/80"></span>
+            <span class="w-3 h-3 rounded-full bg-amber-500/80"></span>
+            <span class="w-3 h-3 rounded-full bg-emerald-500/80"></span>
+            <span class="ml-2 text-xs font-mono text-slate-400">Terminal / Bash / PowerShell</span>
+          </div>
+          <button onclick="copySnippet()" class="text-xs text-brand-400 hover:text-brand-300 font-semibold flex items-center gap-1.5 transition-colors">
+            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+            <span id="copy-text">Copiar comandos</span>
+          </button>
+        </div>
+
+        <div class="p-6 font-mono text-xs sm:text-sm text-slate-200 overflow-x-auto leading-relaxed">
+          <p class="text-slate-500"># 1. Clona el repositorio</p>
+          <p class="text-emerald-400">git clone https://github.com/emerson199818/Media_Video_Downloader_V1.0.git</p>
+          <p class="text-slate-500 mt-3"># 2. Entra a la carpeta e instala dependencias</p>
+          <p class="text-emerald-400">cd Media_Video_Downloader_V1.0 && pip install pillow sv-ttk</p>
+          <p class="text-slate-500 mt-3"># 3. Inicia la aplicación (¡yt-dlp viene preconfigurado!)</p>
+          <p class="text-emerald-400">cd PROYECTO && python3 Media_Downloader.py</p>
+        </div>
+      </div>
+
+      <!-- OS Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+        <div class="p-6 rounded-2xl bg-dark-900 border border-white/5 text-center">
+          <i data-lucide="terminal" class="w-10 h-10 mx-auto text-brand-400 mb-4"></i>
+          <h4 class="font-bold text-lg mb-2">Linux</h4>
+          <p class="text-xs text-slate-400 mb-4">Arch, Garuda, Ubuntu, Debian, Fedora. Requiere <code>ffmpeg</code> del gestor de paquetes.</p>
+          <code class="text-xs text-emerald-400 bg-dark-800 px-3 py-1.5 rounded-lg block">sudo pacman -S ffmpeg</code>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-dark-900 border border-white/5 text-center">
+          <i data-lucide="layout" class="w-10 h-10 mx-auto text-sky-400 mb-4"></i>
+          <h4 class="font-bold text-lg mb-2">Windows 10 / 11</h4>
+          <p class="text-xs text-slate-400 mb-4">Soporta modo claro y oscuro nativo con Fluent UI y notificaciones toast.</p>
+          <code class="text-xs text-sky-400 bg-dark-800 px-3 py-1.5 rounded-lg block">winget install Gyan.FFmpeg</code>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-dark-900 border border-white/5 text-center">
+          <i data-lucide="apple" class="w-10 h-10 mx-auto text-slate-300 mb-4"></i>
+          <h4 class="font-bold text-lg mb-2">macOS</h4>
+          <p class="text-xs text-slate-400 mb-4">Compatible con arquitecturas Apple Silicon M1/M2/M3 e Intel.</p>
+          <code class="text-xs text-slate-300 bg-dark-800 px-3 py-1.5 rounded-lg block">brew install ffmpeg</code>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FAQ SECTION -->
+  <section id="faq" class="py-24">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center mb-16">
+        <span class="text-brand-400 font-bold text-xs uppercase tracking-widest">Preguntas Frecuentes</span>
+        <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight mt-2 mb-4">
+          Resolvemos tus dudas
+        </h2>
+      </div>
+
+      <div class="space-y-4">
+
+        <details class="glass-card rounded-2xl p-6 group cursor-pointer">
+          <summary class="font-bold text-lg text-white flex items-center justify-between list-none">
+            <span>¿Es 100% gratuito y sin publicidad?</span>
+            <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <p class="mt-4 text-slate-400 text-sm leading-relaxed">
+            Sí. Es un proyecto de código abierto bajo la licencia Mozilla Public License 2.0. No contiene malware, rastreadores ni anuncios de ningún tipo.
+          </p>
+        </details>
+
+        <details class="glass-card rounded-2xl p-6 group cursor-pointer">
+          <summary class="font-bold text-lg text-white flex items-center justify-between list-none">
+            <span>¿Cómo funciona la tolerancia al Error 429 de YouTube?</span>
+            <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <p class="mt-4 text-slate-400 text-sm leading-relaxed">
+            YouTube limita las peticiones automáticas a la API de subtítulos con el código HTTP 429. Si esto ocurre, el motor detecta la anomalía al instante y descarga el video completo con su carátula sin abortar el proceso, informándote de manera amigable.
+          </p>
+        </details>
+
+        <details class="glass-card rounded-2xl p-6 group cursor-pointer">
+          <summary class="font-bold text-lg text-white flex items-center justify-between list-none">
+            <span>¿Qué formatos de audio y video están soportados?</span>
+            <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <p class="mt-4 text-slate-400 text-sm leading-relaxed">
+            Para video: MP4 (con calidades desde 360p hasta 4K/8K a 60 FPS). Para audio: MP3 (320 kbps, 256 kbps, 192 kbps), M4A, WAV y FLAC sin pérdidas.
+          </p>
+        </details>
+
+        <details class="glass-card rounded-2xl p-6 group cursor-pointer">
+          <summary class="font-bold text-lg text-white flex items-center justify-between list-none">
+            <span>¿Puedo descargar playlists completas de una sola vez?</span>
+            <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <p class="mt-4 text-slate-400 text-sm leading-relaxed">
+            Sí. Al pegar un enlace de una playlist, el programa detecta todos los videos automáticamente y te pregunta si deseas agregarlos a la cola para descargarlos todos desatendidamente o en paralelo (hasta 4x simultáneos).
+          </p>
+        </details>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="py-12 border-t border-white/10 bg-dark-900 text-slate-400 text-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+      
+      <div class="flex items-center gap-3">
+        <img src="assets/icon.png" alt="Media Downloader Logo" class="w-7 h-7 rounded-lg" />
+        <span class="font-bold text-white">Media Downloader Pro</span>
+        <span class="text-xs text-slate-500">• Licencia MPL 2.0</span>
+      </div>
+
+      <div class="flex items-center gap-6">
+        <a href="#features" class="hover:text-white transition-colors">Características</a>
+        <a href="#install" class="hover:text-white transition-colors">Instalación</a>
+        <a href="https://github.com/emerson199818/Media_Video_Downloader_V1.0" target="_blank" class="hover:text-white transition-colors flex items-center gap-1.5">
+          <i data-lucide="github" class="w-4 h-4"></i>
+          <span>GitHub</span>
+        </a>
+      </div>
+
+      <p class="text-xs text-slate-500">
+        Desarrollado con Python, yt-dlp, FFmpeg, SQLite y sv-ttk.
+      </p>
+
+    </div>
+  </footer>
+
+  <!-- SCRIPT FOR INTERACTION -->
+  <script>
+    lucide.createIcons();
+
+    function switchThemePreview(theme) {
+      const heroImg = document.getElementById('hero-preview-img');
+      const galleryImg = document.getElementById('gallery-preview-img');
+      const btnDark = document.getElementById('btn-theme-dark');
+      const btnLight = document.getElementById('btn-theme-light');
+
+      const src = theme === 'dark' ? 'assets/preview_dark.png' : 'assets/preview_light.png';
+      
+      if (heroImg) heroImg.src = src;
+      if (galleryImg) galleryImg.src = src;
+
+      if (theme === 'dark') {
+        btnDark.className = 'px-6 py-2.5 rounded-xl font-bold text-sm bg-brand-500 text-white shadow-md transition-all flex items-center gap-2';
+        btnLight.className = 'px-6 py-2.5 rounded-xl font-bold text-sm text-slate-400 hover:text-white transition-all flex items-center gap-2';
+      } else {
+        btnLight.className = 'px-6 py-2.5 rounded-xl font-bold text-sm bg-brand-500 text-white shadow-md transition-all flex items-center gap-2';
+        btnDark.className = 'px-6 py-2.5 rounded-xl font-bold text-sm text-slate-400 hover:text-white transition-all flex items-center gap-2';
+      }
+    }
+
+    function copySnippet() {
+      const snippet = "git clone https://github.com/emerson199818/Media_Video_Downloader_V1.0.git && cd Media_Video_Downloader_V1.0 && pip install pillow sv-ttk && cd PROYECTO && python3 Media_Downloader.py";
+      navigator.clipboard.writeText(snippet).then(() => {
+        const copyText = document.getElementById('copy-text');
+        copyText.textContent = "¡Copiado!";
+        setTimeout(() => {
+          copyText.textContent = "Copiar comandos";
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
