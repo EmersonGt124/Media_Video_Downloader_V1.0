@@ -11,10 +11,7 @@ import Botones_Funciones
 from Database import Database
 from Downloader_Engine import DownloaderEngine, format_seconds, format_bytes
 
-# Variables de la vista
 current_analyzed_info: Optional[Dict[str, Any]] = None
-thumb_label_ref: Optional[ttk.Label] = None
-default_no_thumb_img: Optional[ImageTk.PhotoImage] = None
 
 # Controles de interfaz
 entry_url = None
@@ -36,33 +33,32 @@ lbl_progreso_detalles = None
 lbl_progreso_titulo = None
 btn_cancelar = None
 
-# Carpeta de salida elegida por el usuario
 carpeta_salida_actual = Variables.carpeta_descargas_default
 
 def Centro_youtube(parent_frame):
-    """Construye la vista principal moderna del descargador multimedia."""
+    """Construye la vista moderna y 100% responsiva del descargador."""
     global entry_url, lbl_preview_title, lbl_preview_meta, lbl_preview_thumb
     global combo_formato, combo_calidad, chk_metadata_var, chk_subtitles_var
     global btn_descargar_ahora, btn_agregar_cola
     global frame_progreso, pbar, lbl_progreso_pct, lbl_progreso_detalles, lbl_progreso_titulo, btn_cancelar
 
-    container = ttk.Frame(parent_frame, padding=12)
+    container = ttk.Frame(parent_frame, padding=(10, 8))
     container.pack(fill="both", expand=True)
 
     # ==========================================
-    # 1. TARJETA DE BÚSQUEDA Y URL
+    # 1. TARJETA DE BÚSQUEDA Y URL (RESPONSIVA)
     # ==========================================
-    card_busqueda = ttk.LabelFrame(container, text="  Enlace de Video o Lista de Reproducción  ", padding=10)
-    card_busqueda.pack(fill="x", pady=(0, 8))
+    card_busqueda = ttk.LabelFrame(container, text=" Enlace de Video o Playlist ", padding=(8, 6))
+    card_busqueda.pack(fill="x", pady=(0, 6))
 
     frame_input = ttk.Frame(card_busqueda)
     frame_input.pack(fill="x")
 
-    placeholder = "Pega una URL (YouTube, Playlist, Shorts, TikTok, Instagram, Twitter/X...)"
+    placeholder = "Pega una URL (YouTube, Playlist, Shorts, TikTok, Instagram, Twitter...)"
     url_var = tk.StringVar(value="")
 
-    entry_url = ttk.Entry(frame_input, textvariable=url_var, font=("Helvetica", 11))
-    entry_url.pack(side="left", fill="x", expand=True, padx=(0, 8), ipady=4)
+    entry_url = ttk.Entry(frame_input, textvariable=url_var, font=("Helvetica", 10))
+    entry_url.pack(side="left", fill="x", expand=True, padx=(0, 6), ipady=3)
     entry_url.insert(0, placeholder)
 
     def on_entry_focus_in(event):
@@ -77,69 +73,77 @@ def Centro_youtube(parent_frame):
     entry_url.bind("<FocusOut>", on_entry_focus_out)
     entry_url.bind("<Return>", lambda event: iniciar_analisis())
 
-    # Botones de acción del input
-    btn_pegar = ttk.Button(frame_input, text="📋 Pegar", command=lambda: accion_pegar_portapapeles())
-    btn_pegar.pack(side="left", padx=(0, 6))
+    btn_pegar = ttk.Button(frame_input, text="📋 Pegar", width=8, command=accion_pegar_portapapeles)
+    btn_pegar.pack(side="left", padx=(0, 4))
 
-    btn_analizar = ttk.Button(frame_input, text="🔍 Analizar", style="Accent.TButton", command=lambda: iniciar_analisis())
-    btn_analizar.pack(side="left", padx=(0, 6))
+    btn_analizar = ttk.Button(frame_input, text="🔍 Analizar", width=9, style="Accent.TButton", command=iniciar_analisis)
+    btn_analizar.pack(side="left", padx=(0, 4))
 
-    btn_web = ttk.Button(frame_input, text="🌐 Abrir YouTube", command=lambda: accion_abrir_youtube())
+    btn_web = ttk.Button(frame_input, text="🌐 YouTube", width=10, command=accion_abrir_youtube)
     btn_web.pack(side="left")
 
     # ==========================================
-    # 2. TARJETA DE VISTA PREVIA Y OPCIONES
+    # 2. TARJETA DE VISTA PREVIA (MULTIFILA Y RESPONSIVA)
     # ==========================================
-    card_preview = ttk.LabelFrame(container, text="  Opciones y Previsualización  ", padding=10)
-    card_preview.pack(fill="x", pady=(0, 8))
+    card_preview = ttk.LabelFrame(container, text=" Previsualización y Opciones de Descarga ", padding=(8, 6))
+    card_preview.pack(fill="x", pady=(0, 6))
 
     frame_prev_inner = ttk.Frame(card_preview)
     frame_prev_inner.pack(fill="x")
 
-    # Columna Izquierda: Miniatura
-    frame_thumb = ttk.Frame(frame_prev_inner, width=170, height=95)
-    frame_thumb.pack(side="left", padx=(0, 14))
+    # Miniatura a la izquierda
+    frame_thumb = ttk.Frame(frame_prev_inner, width=155, height=88)
+    frame_thumb.pack(side="left", padx=(0, 10))
     frame_thumb.pack_propagate(False)
 
     lbl_preview_thumb = ttk.Label(frame_thumb, text="Sin vista previa", anchor="center")
     lbl_preview_thumb.pack(fill="both", expand=True)
 
-    # Columna Derecha: Información y Opciones
+    # Detalles a la derecha en filas organizadas
     frame_detalles = ttk.Frame(frame_prev_inner)
     frame_detalles.pack(side="left", fill="both", expand=True)
 
+    # Fila 1: Título con auto-wrap dinámico
     lbl_preview_title = ttk.Label(
         frame_detalles,
         text="Introduce un enlace y pulsa 'Analizar' para ver detalles",
-        font=("Helvetica", 11, "bold"),
-        wraplength=550
+        font=("Helvetica", 10, "bold"),
+        wraplength=500
     )
-    lbl_preview_title.pack(anchor="w", pady=(0, 4))
+    lbl_preview_title.pack(anchor="w", pady=(0, 2))
 
+    # Ajustar dinámicamente el salto de línea al redimensionar
+    def _ajustar_wrap(event):
+        nuevo_wrap = max(250, event.width - 20)
+        lbl_preview_title.config(wraplength=nuevo_wrap)
+
+    frame_detalles.bind("<Configure>", _ajustar_wrap)
+
+    # Fila 2: Metadatos
     lbl_preview_meta = ttk.Label(
         frame_detalles,
-        text="Canal: -- | Duración: --:-- | Calidad recomendada: 1080p",
+        text="Canal: -- | Duración: --:-- | Calidad: 1080p",
         font=("Helvetica", 9),
         foreground="#94a3b8"
     )
-    lbl_preview_meta.pack(anchor="w", pady=(0, 8))
+    lbl_preview_meta.pack(anchor="w", pady=(0, 4))
 
-    # Fila de configuración de formato y calidad
-    frame_opciones = ttk.Frame(frame_detalles)
-    frame_opciones.pack(fill="x", pady=(0, 6))
+    # Fila 3: Selectores de Formato y Calidad (Lado a lado, compactos)
+    frame_combos = ttk.Frame(frame_detalles)
+    frame_combos.pack(anchor="w", pady=(0, 4))
 
-    ttk.Label(frame_opciones, text="Formato:").pack(side="left", padx=(0, 4))
+    ttk.Label(frame_combos, text="Formato:").pack(side="left", padx=(0, 4))
     formatos = ["MP4 (Video)", "MP3 (Audio)", "M4A (Audio)", "WAV", "FLAC"]
     formato_var = tk.StringVar(value="MP4 (Video)")
-    combo_formato = ttk.Combobox(frame_opciones, textvariable=formato_var, values=formatos, state="readonly", width=14)
-    combo_formato.pack(side="left", padx=(0, 14))
+    combo_formato = ttk.Combobox(frame_combos, textvariable=formato_var, values=formatos, state="readonly", width=12)
+    combo_formato.pack(side="left", padx=(0, 12))
 
-    ttk.Label(frame_opciones, text="Calidad:").pack(side="left", padx=(0, 4))
+    ttk.Label(frame_combos, text="Calidad:").pack(side="left", padx=(0, 4))
     calidades_video = ["Mejor", "2160p (4K)", "1440p (2K)", "1080p", "720p", "480p", "360p"]
     calidades_audio = ["320 kbps (Máx)", "256 kbps (Alta)", "192 kbps (Estándar)", "128 kbps (Básica)"]
     calidad_var = tk.StringVar(value="1080p")
-    combo_calidad = ttk.Combobox(frame_opciones, textvariable=calidad_var, values=calidades_video, state="readonly", width=16)
-    combo_calidad.pack(side="left", padx=(0, 14))
+    combo_calidad = ttk.Combobox(frame_combos, textvariable=calidad_var, values=calidades_video, state="readonly", width=14)
+    combo_calidad.pack(side="left")
 
     def on_formato_changed(event):
         fmt = formato_var.get()
@@ -152,117 +156,137 @@ def Centro_youtube(parent_frame):
 
     combo_formato.bind("<<ComboboxSelected>>", on_formato_changed)
 
-    # Checkboxes de metadatos y subtítulos
+    # Fila 4: Checkboxes y Botones de acción en subfilas limpias
+    frame_opts_actions = ttk.Frame(frame_detalles)
+    frame_opts_actions.pack(fill="x", pady=(2, 0))
+
+    # Checkboxes a la izquierda
+    frame_checks = ttk.Frame(frame_opts_actions)
+    frame_checks.pack(side="left")
+
     chk_metadata_var = tk.BooleanVar(value=True)
     chk_subtitles_var = tk.BooleanVar(value=False)
 
-    chk_meta = ttk.Checkbutton(frame_opciones, text="Incrustar Carátula / ID3", variable=chk_metadata_var)
-    chk_meta.pack(side="left", padx=(0, 10))
+    chk_meta = ttk.Checkbutton(frame_checks, text="Carátula / ID3", variable=chk_metadata_var)
+    chk_meta.pack(side="left", padx=(0, 8))
 
-    chk_subs = ttk.Checkbutton(frame_opciones, text="Subtítulos (.srt)", variable=chk_subtitles_var)
-    chk_subs.pack(side="left")
+    chk_subs = ttk.Checkbutton(frame_checks, text="Subtítulos (.srt)", variable=chk_subtitles_var)
+    chk_subs.pack(side="left", padx=(0, 12))
 
-    # Botones de Acción Rápida de la tarjeta
-    frame_action_btns = ttk.Frame(frame_detalles)
-    frame_action_btns.pack(fill="x", pady=(4, 0))
+    # Botones de acción
+    frame_action_btns = ttk.Frame(frame_opts_actions)
+    frame_action_btns.pack(side="left")
 
     btn_descargar_ahora = ttk.Button(
         frame_action_btns,
         text="⬇️ Descargar Ahora",
         style="Accent.TButton",
-        command=lambda: accion_descargar_inmediato()
+        command=accion_descargar_inmediato
     )
-    btn_descargar_ahora.pack(side="left", padx=(0, 8))
+    btn_descargar_ahora.pack(side="left", padx=(0, 6))
 
     btn_agregar_cola = ttk.Button(
         frame_action_btns,
-        text="➕ Agregar a la Cola",
-        command=lambda: accion_agregar_a_cola()
+        text="➕ A la Cola",
+        command=accion_agregar_a_cola
     )
-    btn_agregar_cola.pack(side="left", padx=(0, 8))
+    btn_agregar_cola.pack(side="left", padx=(0, 6))
 
     btn_carpeta = ttk.Button(
         frame_action_btns,
-        text="📁 Carpeta de Descargas",
-        command=lambda: accion_cambiar_carpeta()
+        text="📁 Carpeta...",
+        command=accion_cambiar_carpeta
     )
     btn_carpeta.pack(side="left")
 
     # ==========================================
     # 3. TARJETA DE PROGRESO DE DESCARGA
     # ==========================================
-    frame_progreso = ttk.LabelFrame(container, text="  Progreso de Descarga en Vivo  ", padding=8)
-    frame_progreso.pack(fill="x", pady=(0, 8))
+    frame_progreso = ttk.LabelFrame(container, text=" Progreso de Descarga en Vivo ", padding=(8, 4))
+    frame_progreso.pack(fill="x", pady=(0, 6))
 
     frame_pbar_row = ttk.Frame(frame_progreso)
-    frame_pbar_row.pack(fill="x", pady=(2, 4))
+    frame_pbar_row.pack(fill="x", pady=(1, 3))
 
     pbar = ttk.Progressbar(frame_pbar_row, mode="determinate", maximum=100)
-    pbar.pack(side="left", fill="x", expand=True, padx=(0, 8))
+    pbar.pack(side="left", fill="x", expand=True, padx=(0, 6))
 
-    lbl_progreso_pct = ttk.Label(frame_pbar_row, text="0%", font=("Helvetica", 10, "bold"), width=7, anchor="center")
-    lbl_progreso_pct.pack(side="left", padx=(0, 8))
+    lbl_progreso_pct = ttk.Label(frame_pbar_row, text="0%", font=("Helvetica", 9, "bold"), width=6, anchor="center")
+    lbl_progreso_pct.pack(side="left", padx=(0, 6))
 
-    btn_cancelar = ttk.Button(frame_pbar_row, text="⏹️ Cancelar", command=lambda: Botones_Funciones.cancelar_descarga())
+    btn_cancelar = ttk.Button(frame_pbar_row, text="⏹️ Cancelar", width=10, command=Botones_Funciones.cancelar_descarga)
     btn_cancelar.pack(side="left")
 
     frame_pbar_meta = ttk.Frame(frame_progreso)
     frame_pbar_meta.pack(fill="x")
 
-    lbl_progreso_titulo = ttk.Label(frame_pbar_meta, text="En espera de descarga...", font=("Helvetica", 9))
+    lbl_progreso_titulo = ttk.Label(frame_pbar_meta, text="En espera de descarga...", font=("Helvetica", 8))
     lbl_progreso_titulo.pack(side="left", fill="x", expand=True)
 
-    lbl_progreso_detalles = ttk.Label(frame_pbar_meta, text="Velocidad: -- | Restante: --:-- | 0 MB / 0 MB", font=("Helvetica", 9), foreground="#94a3b8")
+    lbl_progreso_detalles = ttk.Label(
+        frame_pbar_meta,
+        text="Velocidad: -- | Restante: --:-- | 0 MB / 0 MB",
+        font=("Helvetica", 8),
+        foreground="#94a3b8"
+    )
     lbl_progreso_detalles.pack(side="right")
 
     # ==========================================
-    # 4. COLA DE DESCARGAS Y PLAYLISTS
+    # 4. COLA DE DESCARGAS (RESPONSIVA)
     # ==========================================
-    card_cola = ttk.LabelFrame(container, text="  Cola de Descargas / Historial  ", padding=8)
+    card_cola = ttk.LabelFrame(container, text=" Cola de Descargas e Historial ", padding=(8, 6))
     card_cola.pack(fill="both", expand=True)
 
     # Treeview
     Botones_Funciones.crear_treeview(card_cola)
 
-    # Botones inferiores de la cola
+    # Barra inferior de botones responsiva
     frame_cola_btns = ttk.Frame(card_cola)
-    frame_cola_btns.pack(fill="x", pady=(8, 0))
+    frame_cola_btns.pack(fill="x", pady=(6, 0))
+
+    # Grupo Izquierdo: Acciones de Descarga
+    frame_btns_left = ttk.Frame(frame_cola_btns)
+    frame_btns_left.pack(side="left")
 
     btn_descargar_sel = ttk.Button(
-        frame_cola_btns,
-        text="⬇️ Descargar Seleccionado",
+        frame_btns_left,
+        text="⬇️ Descargar Sel.",
         style="Accent.TButton",
-        command=lambda: accion_descargar_seleccionado_cola()
+        command=accion_descargar_seleccionado_cola
     )
-    btn_descargar_sel.pack(side="left", padx=(0, 6))
+    btn_descargar_sel.pack(side="left", padx=(0, 4))
 
     btn_descargar_todo = ttk.Button(
-        frame_cola_btns,
-        text="⚡ Descargar Todo Pendiente",
-        command=lambda: accion_descargar_todo_cola()
+        frame_btns_left,
+        text="⚡ Descargar Todo",
+        command=accion_descargar_todo_cola
     )
-    btn_descargar_todo.pack(side="left", padx=(0, 6))
+    btn_descargar_todo.pack(side="left", padx=(0, 4))
 
     btn_abrir_destino = ttk.Button(
-        frame_cola_btns,
+        frame_btns_left,
         text="📂 Abrir Carpeta",
         command=lambda: Botones_Funciones.abrir_carpeta(carpeta_salida_actual)
     )
-    btn_abrir_destino.pack(side="left", padx=(0, 6))
+    btn_abrir_destino.pack(side="left")
+
+    # Grupo Derecho: Gestión y Limpieza
+    frame_btns_right = ttk.Frame(frame_cola_btns)
+    frame_btns_right.pack(side="right")
 
     btn_eliminar = ttk.Button(
-        frame_cola_btns,
-        text="🗑️ Eliminar de la Cola",
-        command=lambda: Botones_Funciones.eliminar_seleccionado()
+        frame_btns_right,
+        text="🗑️ Quitar",
+        command=Botones_Funciones.eliminar_seleccionado
     )
-    btn_eliminar.pack(side="right", padx=(6, 0))
+    btn_eliminar.pack(side="left", padx=(0, 4))
 
     btn_limpiar = ttk.Button(
-        frame_cola_btns,
+        frame_btns_right,
         text="🧹 Limpiar Cola",
-        command=lambda: Botones_Funciones.clear()
+        command=Botones_Funciones.clear
     )
-    btn_limpiar.pack(side="right")
+    btn_limpiar.pack(side="left")
 
     return container
 
@@ -271,7 +295,6 @@ def Centro_youtube(parent_frame):
 # ==========================================
 
 def accion_pegar_portapapeles():
-    """Pega el contenido del portapapeles y analiza si es un enlace."""
     try:
         texto = Variables.root.clipboard_get().strip()
         if texto:
@@ -298,7 +321,6 @@ def accion_cambiar_carpeta():
         Alertas.alerta_ok(Variables.titulo, "Carpeta Actualizada", f"Las descargas se guardarán en:\n{carpeta_salida_actual}")
 
 def iniciar_analisis():
-    """Analiza la URL en un hilo en segundo plano para no congelar la GUI."""
     url = entry_url.get().strip()
     if not url or "Pega una URL" in url:
         Alertas.alerta_Amarilla(Variables.titulo, "Campo vacío", "Introduce una URL válida para analizar.")
@@ -322,14 +344,12 @@ def _mostrar_resultado_analisis(info: Dict[str, Any]):
     current_analyzed_info = info
 
     if info.get('is_playlist'):
-        # Lista de reproducción
         titulo = info.get('title', 'Lista de reproducción')
         conteo = info.get('count', 0)
         lbl_preview_title.config(text=f"📋 Playlist: {titulo} ({conteo} videos)")
         lbl_preview_meta.config(text=f"Canal/Creador: {info.get('uploader')} | Total videos: {conteo}")
         lbl_preview_thumb.config(text="📋 Playlist", image="")
 
-        # Preguntar si desea agregar automáticamente a la cola
         res = Alertas.alerta_aceptar(
             Variables.titulo,
             "Playlist Detectada",
@@ -340,7 +360,6 @@ def _mostrar_resultado_analisis(info: Dict[str, Any]):
             Botones_Funciones.actualizar_treeview()
             Alertas.alerta_ok(Variables.titulo, "Lista Agregada", f"{conteo} videos han sido agregados a la cola.")
     else:
-        # Video individual
         titulo = info.get('title', 'Sin título')
         duracion = info.get('duration_str', '--:--')
         uploader = info.get('uploader', 'Desconocido')
@@ -350,12 +369,10 @@ def _mostrar_resultado_analisis(info: Dict[str, Any]):
         lbl_preview_title.config(text=titulo)
         lbl_preview_meta.config(text=f"Canal: {uploader} | Duración: {duracion} | Vistas: {vistas_str}")
 
-        # Cargar miniatura
         thumb_url = info.get('thumbnail')
         if thumb_url:
             Botones_Funciones.descargar_miniatura_async(thumb_url, _actualizar_miniatura_ui)
 
-        # Actualizar resoluciones disponibles en el combobox
         resoluciones = info.get('resolutions', [])
         if resoluciones and "MP4" in combo_formato.get():
             combo_calidad.config(values=["Mejor"] + resoluciones)
@@ -374,7 +391,6 @@ def _mostrar_error_analisis(err_msg: str):
     Alertas.alerta_error(Variables.titulo, "Error de Análisis", f"No se pudo extraer información del enlace:\n\n{err_msg}")
 
 def accion_agregar_a_cola():
-    """Agrega el video analizado actual a la cola de SQLite."""
     global current_analyzed_info
     if not current_analyzed_info:
         url = entry_url.get().strip()
@@ -399,7 +415,6 @@ def accion_agregar_a_cola():
     Alertas.alerta_ok(Variables.titulo, "Cola Actualizada", "El elemento ha sido agregado a la cola con éxito.")
 
 def _progreso_callback(d: Dict[str, Any]):
-    """Actualiza la barra de progreso y etiquetas en tiempo real."""
     percent = d.get('percent', 0.0)
     pbar['value'] = percent
     lbl_progreso_pct.config(text=d.get('percent_str', f"{percent:.1f}%"))
@@ -415,7 +430,6 @@ def _progreso_callback(d: Dict[str, Any]):
     lbl_progreso_detalles.config(text=f"Velocidad: {speed} | Restante: {eta} | {dl_str} / {total_str}")
 
 def accion_descargar_inmediato():
-    """Descarga el video analizado inmediatamente."""
     global current_analyzed_info, carpeta_salida_actual
     if not current_analyzed_info:
         url = entry_url.get().strip()
@@ -426,12 +440,11 @@ def accion_descargar_inmediato():
         return
 
     url = current_analyzed_info.get('url')
-    formato_raw = combo_formato.get().split()[0]  # MP4, MP3, etc.
+    formato_raw = combo_formato.get().split()[0]
     calidad = combo_calidad.get()
     meta = chk_metadata_var.get()
     subs = chk_subtitles_var.get()
 
-    # Guardar en base de datos como pendiente
     Database.add_video(
         title=current_analyzed_info.get('title', 'Video'),
         duration=current_analyzed_info.get('duration_str', '00:00'),
@@ -442,17 +455,16 @@ def accion_descargar_inmediato():
     )
     Botones_Funciones.actualizar_treeview()
 
-    # Iniciar descarga
     pbar['value'] = 0
     lbl_progreso_pct.config(text="0%")
-    lbl_progreso_titulo.config(text=f"Iniciando descarga de: {current_analyzed_info.get('title')}")
+    lbl_progreso_titulo.config(text=f"Iniciando descarga: {current_analyzed_info.get('title')}")
 
     def on_complete(success: bool, msg: str):
         if success:
             pbar['value'] = 100
             lbl_progreso_pct.config(text="100%")
             lbl_progreso_titulo.config(text="✅ Descarga completada")
-            lbl_progreso_detalles.config(text="Archivo procesado correctamente con FFmpeg.")
+            lbl_progreso_detalles.config(text="Archivo procesado con éxito.")
             Alertas.alerta_ok(Variables.titulo, "Descarga Finalizada", msg)
         else:
             lbl_progreso_titulo.config(text="❌ Descarga no completada")
@@ -471,7 +483,6 @@ def accion_descargar_inmediato():
     )
 
 def accion_descargar_seleccionado_cola():
-    """Descarga el elemento seleccionado en la cola."""
     if not Botones_Funciones.treeview_ref:
         return
     seleccion = Botones_Funciones.treeview_ref.selection()
@@ -519,7 +530,6 @@ def accion_descargar_seleccionado_cola():
     )
 
 def accion_descargar_todo_cola():
-    """Descarga por lotes todos los videos pendientes de la cola."""
     pendientes = Database.get_pending()
     if not pendientes:
         Alertas.alerta_ok(Variables.titulo, "Cola vacía", "No hay videos pendientes por descargar en la cola.")

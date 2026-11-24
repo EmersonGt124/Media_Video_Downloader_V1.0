@@ -1,8 +1,9 @@
 import os
 import sys
+import re
 import threading
 import time
-from typing import Optional, Callable, Dict, Any, List
+from typing import Optional, Callable, Dict, Any, List, Tuple
 
 # Ensure lib/yt_dlp_bin is on sys.path
 lib_bin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "lib", "yt_dlp_bin"))
@@ -12,7 +13,6 @@ if os.path.exists(lib_bin_path) and lib_bin_path not in sys.path:
 try:
     import yt_dlp
 except ImportError:
-    # Fallback to local import
     import importlib.util
     spec = importlib.util.spec_from_file_location("yt_dlp", lib_bin_path)
     if spec and spec.loader:
@@ -20,6 +20,16 @@ except ImportError:
         spec.loader.exec_module(yt_dlp)
     else:
         raise RuntimeError("No se pudo cargar la librería yt_dlp.")
+
+
+def clean_ansi(text: str) -> str:
+    """Elimina secuencias de escape ANSI de mensajes de error de yt-dlp."""
+    if not text:
+        return ""
+    # Quitar códigos ANSI tipo \x1b[0;31m
+    cleaned = re.sub(r'\x1b\[[0-9;]*[a-zA-Z]', '', text)
+    cleaned = cleaned.replace('\x1b', '').strip()
+    return cleaned
 
 
 def format_seconds(seconds: Optional[int]) -> str:
@@ -103,7 +113,6 @@ class DownloaderEngine:
             else:
                 # Video único
                 duration = info.get('duration', 0)
-                # Formatos de resolución disponibles
                 available_resolutions = set()
                 formats = info.get('formats', [])
                 for f in formats:
@@ -111,10 +120,6 @@ class DownloaderEngine:
                     if height:
                         available_resolutions.add(f"{height}p")
 
-                # Ordenar resoluciones comunes
-                order_priority = ["2160p (4K)", "1440p (2K)", "1080p", "720p", "480p", "360p", "240p"]
-                sorted_resolutions = []
-                # Map standard heights
                 standard_map = {
                     "2160p": "2160p (4K)",
                     "1440p": "1440p (2K)",
@@ -124,6 +129,7 @@ class DownloaderEngine:
                     "360p": "360p",
                     "240p": "240p"
                 }
+                sorted_resolutions = []
                 for std, label in standard_map.items():
                     if std in available_resolutions:
                         sorted_resolutions.append(label)
@@ -144,25 +150,19 @@ class DownloaderEngine:
                 }
 
     @staticmethod
-    def download(
+    def _execute_ydl(
         url: str,
         output_dir: str,
-        format_type: str = "MP4",
-        quality: str = "1080p",
-        embed_metadata: bool = True,
-        embed_thumbnail: bool = True,
-        download_subtitles: bool = False,
-        progress_callback: Optional[Callable[[Dict[str, Any]], None]] = None,
-        cancel_event: Optional[threading.Event] = None
-    ) -> str:
-        """
-        Descarga el medio con las opciones especificadas.
-        format_type: MP4, MP3, M4A, WAV, FLAC
-        quality: "Mejor", "2160p (4K)", "1440p (2K)", "1080p", "720p", "480p", "360p"
-                 o para audio "320 kbps", "256 kbps", "192 kbps", "128 kbps"
-        """
+        format_type: str,
+        quality: str,
+        embed_metadata: bool,
+        embed_thumbnail: bool,
+        download_subtitles: bool,
+        progress_callback: Optional[Callable[[Dict[str, Any]], None]],
+        cancel_event: Optional[threading.Event]
+    ) -> Tuple[str, Optional[str]]:
+        """Función interna que configura y ejecuta yt-dlp."""
         os.makedirs(output_dir, exist_ok=True)
-        final_filename = ""
 
         def progress_hook(d):
             if cancel_event and cancel_event.is_set():
@@ -204,10 +204,8 @@ class DownloaderEngine:
                     'filename': os.path.basename(d.get('filename', ''))
                 })
 
-        # Template de archivo de salida
         outtmpl = os.path.join(output_dir, '%(title)s [%(id)s].%(ext)s')
 
-        # Configurar ydl_opts
         ydl_opts: Dict[str, Any] = {
             'outtmpl': outtmpl,
             'quiet': True,
@@ -217,15 +215,12 @@ class DownloaderEngine:
             'nocheckcertificate': True,
         }
 
-        # Configuración según Formato
         format_clean = format_type.upper().strip()
 
         if format_clean in ["MP3", "M4A", "WAV", "FLAC"]:
-            # Extracción de Audio
             ydl_opts['format'] = 'bestaudio/best'
             postprocessors = []
 
-            # Calidad de audio
             audio_quality = "192"
             if "320" in quality:
                 audio_quality = "320"
@@ -250,8 +245,6 @@ class DownloaderEngine:
             ydl_opts['postprocessors'] = postprocessors
 
         else:
-            # Descarga de Video (MP4 por defecto)
-            # Parsear resolución objetivo
             height = None
             if "2160" in quality or "4K" in quality:
                 height = 2160
@@ -297,17 +290,104 @@ class DownloaderEngine:
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=True)
-            if info:
-                title = info.get('title', 'Video')
-                if progress_callback:
-                    progress_callback({
-                        'status': 'finished',
-                        'percent': 100.0,
-                        'percent_str': "100%",
-                        'speed_str': "Finalizado",
-                        'eta_str': "¡Listo!",
-                        'title': title
-                    })
-                return title
+            title = info.get('title', 'Video') if info else 'Descarga completa'
+            if progress_callback:
+                progress_callback({
+                    'status': 'finished',
+                    'percent': 100.0,
+                    'percent_str': "100%",
+                    'speed_str': "Finalizado",
+                    'eta_str': "¡Listo!",
+                    'title': title
+                })
+            return title, None
 
-        return "Descarga completa"
+    @classmethod
+    def download(
+        cls,
+        url: str,
+        output_dir: str,
+        format_type: str = "MP4",
+        quality: str = "1080p",
+        embed_metadata: bool = True,
+        embed_thumbnail: bool = True,
+        download_subtitles: bool = False,
+        progress_callback: Optional[Callable[[Dict[str, Any]], None]] = None,
+        cancel_event: Optional[threading.Event] = None
+    ) -> Tuple[str, Optional[str]]:
+        """
+        Descarga el medio con tolerancia a fallos:
+        Si fallan los subtítulos (error 429 de YouTube) o la carátula,
+        reintenta automáticamente para que el video/audio NO falle,
+        y devuelve un aviso descriptivo para el usuario.
+        """
+        # Intento 1: con todas las opciones seleccionadas
+        try:
+            return cls._execute_ydl(
+                url=url,
+                output_dir=output_dir,
+                format_type=format_type,
+                quality=quality,
+                embed_metadata=embed_metadata,
+                embed_thumbnail=embed_thumbnail,
+                download_subtitles=download_subtitles,
+                progress_callback=progress_callback,
+                cancel_event=cancel_event
+            )
+        except Exception as e:
+            err_msg = clean_ansi(str(e))
+            if "DESCARGA_CANCELADA_POR_USUARIO" in err_msg:
+                raise e
+
+            # Si el fallo se debe a subtítulos (como HTTP 429: Too Many Requests)
+            if download_subtitles and any(k in err_msg.lower() for k in ["subtitle", "subtítulo", "429"]):
+                # Reintentar automáticamente sin subtítulos
+                try:
+                    title, _ = cls._execute_ydl(
+                        url=url,
+                        output_dir=output_dir,
+                        format_type=format_type,
+                        quality=quality,
+                        embed_metadata=embed_metadata,
+                        embed_thumbnail=embed_thumbnail,
+                        download_subtitles=False,
+                        progress_callback=progress_callback,
+                        cancel_event=cancel_event
+                    )
+                    warning = (
+                        "⚠️ Nota de Subtítulos:\n"
+                        "YouTube no permitió la descarga de subtítulos para este video "
+                        "(Error 429: Too Many Requests o no disponibles).\n\n"
+                        "El video/audio se descargó y procesó con éxito sin subtítulos.\n"
+                        "Puedes desmarcar la casilla 'Subtítulos (.srt)' para evitar esta comprobación."
+                    )
+                    return title, warning
+                except Exception as e2:
+                    err_msg = clean_ansi(str(e2))
+
+            # Si el fallo se debe a la carátula / thumbnail
+            if embed_thumbnail and any(k in err_msg.lower() for k in ["thumbnail", "carátula", "mutagen", "atomicparsley"]):
+                try:
+                    title, _ = cls._execute_ydl(
+                        url=url,
+                        output_dir=output_dir,
+                        format_type=format_type,
+                        quality=quality,
+                        embed_metadata=embed_metadata,
+                        embed_thumbnail=False,
+                        download_subtitles=False,
+                        progress_callback=progress_callback,
+                        cancel_event=cancel_event
+                    )
+                    warning = (
+                        "⚠️ Nota de Carátula:\n"
+                        "No fue posible incrustar la carátula en este archivo específico.\n\n"
+                        "El video/audio se descargó correctamente sin carátula embebida.\n"
+                        "Puedes desactivar la opción 'Incrustar Carátula / ID3'."
+                    )
+                    return title, warning
+                except Exception as e3:
+                    err_msg = clean_ansi(str(e3))
+
+            # Si no se pudo recuperar, lanzar excepción con mensaje limpio
+            raise Exception(err_msg)

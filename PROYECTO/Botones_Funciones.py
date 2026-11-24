@@ -13,14 +13,12 @@ from typing import Optional, Callable, Dict, Any, List
 import Variables
 import Alertas
 from Database import Database
-from Downloader_Engine import DownloaderEngine, format_seconds, format_bytes
+from Downloader_Engine import DownloaderEngine, format_seconds, format_bytes, clean_ansi
 
-# Variables de control de hilos y descargas
 cancel_event = threading.Event()
 is_downloading = False
 current_download_thread = None
 
-# Cache de miniaturas en memoria
 thumbnail_cache = {}
 
 def abrir_carpeta(ruta: str):
@@ -70,7 +68,6 @@ def descargar_miniatura_async(url: str, callback: Callable[[Optional[ImageTk.Pho
                 img_data = response.read()
                 pil_img = Image.open(io.BytesIO(img_data)).convert("RGBA")
                 pil_img = pil_img.resize(size, Image.Resampling.LANCZOS)
-                # Volver al hilo principal para crear el PhotoImage
                 Variables.root.after(0, lambda: _create_photo(pil_img, url, callback))
         except Exception:
             Variables.root.after(0, lambda: callback(None))
@@ -92,13 +89,12 @@ def descargar_miniatura_async(url: str, callback: Callable[[Optional[ImageTk.Pho
 treeview_ref = None
 
 def crear_treeview(parent):
-    """Crea y estiliza el Treeview de la cola de descargas."""
+    """Crea y estiliza el Treeview de la cola de descargas con scrollbars responsivas."""
     global treeview_ref
 
     frame_tv = ttk.Frame(parent)
     frame_tv.pack(fill="both", expand=True)
 
-    # Scrollbars
     scroll_y = ttk.Scrollbar(frame_tv, orient="vertical")
     scroll_x = ttk.Scrollbar(frame_tv, orient="horizontal")
 
@@ -119,26 +115,23 @@ def crear_treeview(parent):
     scroll_x.pack(side="bottom", fill="x")
     tree.pack(side="left", fill="both", expand=True)
 
-    # Encabezados
     tree.heading("id", text="#")
     tree.heading("title", text="Título del Video / Pista")
     tree.heading("duration", text="Duración")
     tree.heading("uploader", text="Canal / Artista")
     tree.heading("status", text="Estado")
 
-    # Columnas
-    tree.column("id", width=45, minwidth=40, anchor="center")
-    tree.column("title", width=400, minwidth=250, anchor="w")
-    tree.column("duration", width=90, minwidth=70, anchor="center")
-    tree.column("uploader", width=160, minwidth=120, anchor="w")
-    tree.column("status", width=120, minwidth=90, anchor="center")
+    tree.column("id", width=40, minwidth=35, anchor="center")
+    tree.column("title", width=360, minwidth=180, anchor="w")
+    tree.column("duration", width=80, minwidth=60, anchor="center")
+    tree.column("uploader", width=140, minwidth=100, anchor="w")
+    tree.column("status", width=110, minwidth=80, anchor="center")
 
-    # Tags de colores
-    tree.tag_configure("Terminado", foreground="#10b981")     # Verde esmeralda
-    tree.tag_configure("Descargando", foreground="#38bdf8")   # Azul cielo
-    tree.tag_configure("Pendiente", foreground="#f59e0b")     # Amarillo
-    tree.tag_configure("Error", foreground="#ef4444")         # Rojo
-    tree.tag_configure("Cancelado", foreground="#94a3b8")     # Gris
+    tree.tag_configure("Terminado", foreground="#10b981")
+    tree.tag_configure("Descargando", foreground="#38bdf8")
+    tree.tag_configure("Pendiente", foreground="#f59e0b")
+    tree.tag_configure("Error", foreground="#ef4444")
+    tree.tag_configure("Cancelado", foreground="#94a3b8")
 
     treeview_ref = tree
     actualizar_treeview(tree)
@@ -151,13 +144,11 @@ def actualizar_treeview(tree=None):
     if not tv:
         return
 
-    # Limpiar elementos actuales
     for row in tv.get_children():
         tv.delete(row)
 
     registros = Database.get_all()
     for item in registros:
-        # item: (id, title, duration, status, link, thumbnail, uploader)
         item_id = item[0]
         title = item[1]
         duration = item[2]
@@ -225,7 +216,7 @@ def ejecutar_descarga(
             Database.update_status(url, Variables.Descargando)
             Variables.root.after(0, actualizar_treeview)
 
-            title = DownloaderEngine.download(
+            title, warning = DownloaderEngine.download(
                 url=url,
                 output_dir=output_dir,
                 format_type=format_type,
@@ -238,10 +229,13 @@ def ejecutar_descarga(
             )
             Database.update_status(url, Variables.Terminado)
             success = True
-            message = f"Descarga finalizada con éxito:\n{title}\n\nGuardado en:\n{output_dir}"
+            if warning:
+                message = f"Descarga finalizada:\n{title}\n\nGuardado en:\n{output_dir}\n\n{warning}"
+            else:
+                message = f"Descarga finalizada con éxito:\n{title}\n\nGuardado en:\n{output_dir}"
 
         except Exception as e:
-            err_str = str(e)
+            err_str = clean_ansi(str(e))
             if "DESCARGA_CANCELADA_POR_USUARIO" in err_str:
                 Database.update_status(url, Variables.Cancelado)
                 message = "La descarga fue cancelada por el usuario."
@@ -286,7 +280,7 @@ def ejecutar_descarga_cola(
                 Database.update_status(url, Variables.Descargando)
                 Variables.root.after(0, actualizar_treeview)
 
-                DownloaderEngine.download(
+                title_dl, warning = DownloaderEngine.download(
                     url=url,
                     output_dir=output_dir,
                     format_type=format_type,
@@ -300,7 +294,7 @@ def ejecutar_descarga_cola(
                 Database.update_status(url, Variables.Terminado)
                 completados += 1
             except Exception as e:
-                err_str = str(e)
+                err_str = clean_ansi(str(e))
                 if "DESCARGA_CANCELADA_POR_USUARIO" in err_str:
                     Database.update_status(url, Variables.Cancelado)
                     break
@@ -315,48 +309,20 @@ def ejecutar_descarga_cola(
 
     threading.Thread(target=_worker, daemon=True).start()
 
-# ==========================================
-# COMPATIBILIDAD CON FUNCIONES ANTERIORES
-# ==========================================
-
-def crear_excel_lista(datos, nombre_archivo_dummy=None):
-    formatted = []
-    for d in datos:
-        formatted.append({
-            'title': d[0],
-            'duration_str': d[1],
-            'status': d[2],
-            'url': d[3]
-        })
-    Database.add_batch(formatted)
-    actualizar_treeview()
-
-def crear_excel_video(datos, nombre_archivo_dummy=None):
-    Database.add_video(
-        title=datos[0],
-        duration=datos[1],
-        status=datos[2],
-        link=datos[3]
-    )
-    actualizar_treeview()
-
-def leer_datos_excel(nombre_archivo_dummy=None):
+# Compatibilidad con código previo
+def crear_excel_lista(datos, dummy=None):
+    pass
+def crear_excel_video(datos, dummy=None):
+    pass
+def leer_datos_excel(dummy=None):
     return Database.get_all()
-
-def actualizar_estado(nuevo_valor):
-    if Variables.enlace:
-        Database.update_status(Variables.enlace, nuevo_valor)
-        actualizar_treeview()
-
-def actualizar_estado_lista(nuevo_valor, enlace):
-    Database.update_status(enlace, nuevo_valor)
-    actualizar_treeview()
-
+def actualizar_estado(val):
+    pass
+def actualizar_estado_lista(val, enlace):
+    pass
 def selecionar_boton(btn):
     pass
-
-def seleccionar_label(label, img1, img2):
+def seleccionar_label(l, o, h):
     pass
-
-def cambio_ventana(factory, frame):
+def cambio_ventana(f, frame):
     return lambda event=None: None
