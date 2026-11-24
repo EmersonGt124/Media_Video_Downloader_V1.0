@@ -19,9 +19,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: windows-latest
-            artifact_pattern: dist/*.zip
-            platform: windows
           - os: ubuntu-latest
             artifact_pattern: dist/*.tar.gz
             platform: linux
@@ -43,12 +40,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-
-      # Windows: Instalar FFmpeg
-      - name: Instalar FFmpeg en Windows
-        if: matrix.platform == 'windows'
-        run: |
-          choco install ffmpeg -y
 
       # Linux: Instalar FFmpeg
       - name: Instalar FFmpeg en Linux
