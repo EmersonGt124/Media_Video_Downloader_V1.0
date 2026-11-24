@@ -75,6 +75,7 @@ jobs:
   release:
     name: Publicar GitHub Release
     needs: build
+    if: always() && (needs.build.result == 'success' || contains(needs.build.result, 'success'))
     runs-on: ubuntu-latest
     steps:
       - name: Descargar Todos los Artefactos

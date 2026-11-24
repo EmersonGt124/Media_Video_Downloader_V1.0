@@ -26,40 +26,8 @@ def clean():
             print(f"Limpiando {d}...")
             shutil.rmtree(d, ignore_errors=True)
 
-def prepare_ffmpeg():
-    """Detecta FFmpeg en el sistema y lo copia a PROYECTO/lib/ffmpeg si existe."""
-    ffmpeg_dir = os.path.join(PROYECTO_DIR, "lib", "ffmpeg")
-    os.makedirs(ffmpeg_dir, exist_ok=True)
-
-    system = platform.system().lower()
-    bin_ext = ".exe" if system == "windows" else ""
-
-    for tool in ["ffmpeg", "ffprobe"]:
-        target = os.path.join(ffmpeg_dir, f"{tool}{bin_ext}")
-        if not os.path.exists(target):
-            sys_path = shutil.which(tool)
-            if not sys_path and system == "windows":
-                common_paths = [
-                    rf"C:\ProgramData\chocolatey\bin\{tool}.exe",
-                    rf"C:\ProgramData\chocolatey\lib\ffmpeg\tools\ffmpeg\bin\{tool}.exe",
-                    rf"C:\tools\ffmpeg\bin\{tool}.exe",
-                ]
-                for cp in common_paths:
-                    if os.path.isfile(cp):
-                        sys_path = cp
-                        break
-            if sys_path:
-                real_p = os.path.realpath(sys_path)
-                if os.path.isfile(real_p):
-                    print(f"Copiando {tool} desde {real_p} a {target}...")
-                    try:
-                        shutil.copy2(real_p, target)
-                    except Exception as e:
-                        print(f"Aviso al copiar {tool}: {e}")
-
 def run_pyinstaller():
     """Ejecuta PyInstaller con todos los argumentos requeridos."""
-    prepare_ffmpeg()
     system = platform.system().lower()
     sep = ";" if system == "windows" else ":"
 
@@ -76,12 +44,6 @@ def run_pyinstaller():
         # Incluir recursos y assets de la app
         f"--add-data={DATA_DIR}{sep}lib/data",
     ]
-
-    # Incluir FFmpeg si está en lib/ffmpeg
-    ffmpeg_dir = os.path.join(PROYECTO_DIR, "lib", "ffmpeg")
-    if os.path.isdir(ffmpeg_dir) and os.listdir(ffmpeg_dir):
-        print(f"Incluyendo binarios de FFmpeg desde {ffmpeg_dir}...")
-        cmd.append(f"--add-data={ffmpeg_dir}{sep}lib/ffmpeg")
 
     # Icono según sistema operativo
     if system == "windows":
@@ -111,6 +73,29 @@ def package_artifacts():
     if not os.path.exists(target_folder):
         print(f"Error: No se encontró la carpeta compilada en {target_folder}")
         sys.exit(1)
+
+    # Copiar FFmpeg directamente junto al ejecutable si está en el sistema
+    bin_ext = ".exe" if system == "windows" else ""
+    for tool in ["ffmpeg", "ffprobe"]:
+        tool_name = f"{tool}{bin_ext}"
+        dest_bin = os.path.join(target_folder, tool_name)
+        if not os.path.exists(dest_bin):
+            src_bin = shutil.which(tool)
+            if not src_bin and system == "windows":
+                for candidate in [
+                    rf"C:\ProgramData\chocolatey\bin\{tool}.exe",
+                    rf"C:\ProgramData\chocolatey\lib\ffmpeg\tools\ffmpeg\bin\{tool}.exe",
+                    rf"C:\tools\ffmpeg\bin\{tool}.exe",
+                ]:
+                    if os.path.isfile(candidate):
+                        src_bin = candidate
+                        break
+            if src_bin and os.path.isfile(src_bin):
+                print(f"Copiando {tool} desde {src_bin} a {dest_bin}...")
+                try:
+                    shutil.copy2(src_bin, dest_bin)
+                except Exception as e:
+                    print(f"Aviso al copiar {tool}: {e}")
 
     if system == "windows":
         archive_name = os.path.join(DIST_DIR, f"{OUTPUT_NAME}-Windows-x64.zip")
