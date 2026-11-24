@@ -82,7 +82,7 @@
 
 1. **Clonar el repositorio:**
    ```bash
-   git clone https://github.com/emerson199818/Media_Video_Downloader_V1.0.git
+   git clone https://github.com/EmersonGt124/Media_Video_Downloader_V1.0.git
    cd Media_Video_Downloader_V1.0
    ```
 
