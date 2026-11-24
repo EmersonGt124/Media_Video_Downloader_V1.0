@@ -513,6 +513,174 @@
       gap: 20px;
     }
 
+    /* WEB APP LITE & MODAL STYLES */
+    .btn-glow {
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(99, 102, 241, 0.15));
+      border: 1px solid rgba(56, 189, 248, 0.5);
+      color: #38bdf8;
+      box-shadow: 0 0 15px rgba(14, 165, 233, 0.2);
+    }
+    .btn-glow:hover {
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.25), rgba(99, 102, 241, 0.25));
+      border-color: #38bdf8;
+      box-shadow: 0 0 25px rgba(14, 165, 233, 0.35);
+      transform: translateY(-2px);
+    }
+
+    .web-app-wrapper {
+      max-width: 920px;
+      margin: 0 auto;
+      background: #0b1120;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.8), 0 0 35px rgba(14, 165, 233, 0.08);
+      position: relative;
+    }
+
+    .web-input-group {
+      display: flex;
+      gap: 10px;
+      background: #060913;
+      border: 1px solid var(--border-color);
+      padding: 8px 12px;
+      border-radius: 16px;
+      align-items: center;
+      transition: all 0.2s;
+    }
+    .web-input-group:focus-within {
+      border-color: #38bdf8;
+      box-shadow: 0 0 15px rgba(14, 165, 233, 0.25);
+    }
+
+    .web-input-group input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 1.02rem;
+      padding: 8px 6px;
+    }
+    .web-input-group input::placeholder {
+      color: #64748b;
+    }
+
+    .quick-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+      align-items: center;
+    }
+    .chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #94a3b8;
+      padding: 5px 14px;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .chip:hover {
+      background: rgba(14, 165, 233, 0.15);
+      border-color: rgba(14, 165, 233, 0.4);
+      color: #38bdf8;
+    }
+
+    .web-result-box {
+      margin-top: 28px;
+      background: #111827;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 24px;
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .web-result-inner {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .web-thumb-wrap {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #000;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      aspect-ratio: 16/9;
+    }
+    .web-thumb-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .locked-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+      color: #94a3b8;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .locked-badge:hover {
+      border-color: #f59e0b;
+      color: #f59e0b;
+      background: rgba(245, 158, 11, 0.08);
+      transform: translateY(-1px);
+    }
+
+    /* MODAL PRO */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(5, 8, 16, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-card {
+      background: #0f172a;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      border-radius: 24px;
+      max-width: 520px;
+      width: 100%;
+      padding: 32px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.9);
+      text-align: center;
+      animation: modalPop 0.25s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes modalPop {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
     /* RESPONSIVE */
     @media (max-width: 768px) {
       .nav-links {
@@ -526,6 +694,9 @@
       }
       .hero-cta .btn {
         width: 100%;
+      }
+      .web-result-inner {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -543,14 +714,19 @@
       </a>
 
       <div class="nav-links">
+        <a href="#webapp" style="color: #38bdf8; font-weight: 700;">🌐 Probar Online</a>
         <a href="#features">Características</a>
         <a href="#preview">Capturas</a>
         <a href="#comparativa">Comparativa</a>
-        <a href="#install">Instalación</a>
+        <a href="#install">Descargas</a>
         <a href="#faq">FAQ</a>
       </div>
 
       <div class="nav-actions">
+        <a href="#webapp" class="btn btn-glow">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          <span>Probar Online</span>
+        </a>
         <a href="https://github.com/EmersonGt124/Media_Video_Downloader_V1.0" target="_blank" class="btn btn-secondary">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
           <span>GitHub</span>
@@ -585,12 +761,17 @@
       <div class="hero-cta">
         <a href="#install" class="btn btn-primary" style="padding: 14px 28px; font-size: 1.05rem;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-          <span>Obtener Media Downloader Pro</span>
+          <span>Descargar App Completa</span>
+        </a>
+
+        <a href="#webapp" class="btn btn-glow" style="padding: 14px 28px; font-size: 1.05rem;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          <span>Probar Online en la Web</span>
         </a>
 
         <a href="https://github.com/EmersonGt124/Media_Video_Downloader_V1.0" target="_blank" class="btn btn-secondary" style="padding: 14px 28px; font-size: 1.05rem;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-          <span>Dar Estrella en GitHub</span>
+          <span>GitHub</span>
         </a>
       </div>
 
@@ -615,6 +796,139 @@
         <span class="platform-item" style="color: #f97316;">☁ SoundCloud</span>
         <span class="platform-item" style="color: #a855f7;">👾 Twitch Clips</span>
       </div>
+    </div>
+  </section>
+
+  <!-- WEB APP LITE SECTION (PROBAR ONLINE) -->
+  <section id="webapp" class="section" style="background: radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.12) 0%, transparent 60%); padding: 70px 0;">
+    <div class="container">
+      
+      <div class="section-header" style="margin-bottom: 36px;">
+        <span class="section-tag" style="background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.3); padding: 4px 14px; border-radius: 9999px; display: inline-block;">🌐 Versión Web Lite • Demo en Vivo</span>
+        <h2 class="section-title">Pruébalo ahora mismo desde tu navegador</h2>
+        <p class="section-desc">Pega cualquier enlace público de YouTube, Shorts, TikTok, Instagram o Twitter/X para extraer la información y descargar en calidad estándar sin instalar nada.</p>
+      </div>
+
+      <div class="web-app-wrapper">
+        
+        <!-- BARRA DE ENLACE -->
+        <div class="web-input-group">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" style="margin-left: 6px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="web-url-input" placeholder="Pega un enlace de YouTube, TikTok, Instagram, Twitter/X o SoundCloud..." onkeydown="if(event.key==='Enter') analizarEnlaceWeb();" />
+          
+          <button onclick="pegarDelPortapapeles()" class="btn btn-secondary" style="padding: 8px 14px; font-size: 0.85rem;" title="Pegar del portapapeles">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+            <span>Pegar</span>
+          </button>
+          
+          <button id="btn-analizar-web" onclick="analizarEnlaceWeb()" class="btn btn-primary" style="padding: 8px 20px; font-size: 0.92rem;">
+            <span id="txt-analizar">Analizar</span>
+          </button>
+        </div>
+
+        <!-- CHIPS DE EJEMPLO -->
+        <div class="quick-chips">
+          <span style="font-size: 0.8rem; color: #64748b; font-weight: 600;">⚡ Enlaces de prueba rápida:</span>
+          <button class="chip" onclick="cargarEjemplo('https://www.youtube.com/watch?v=dQw4w9WgXcQ')">🎵 Rick Astley - 4K Remaster</button>
+          <button class="chip" onclick="cargarEjemplo('https://www.youtube.com/watch?v=jfKfPfyJRdk')">🎧 Lofi Girl Chill Beats</button>
+          <button class="chip" onclick="cargarEjemplo('https://vimeo.com/76979871')">🎬 Video Vimeo HD</button>
+        </div>
+
+        <!-- SPINNER DE CARGA -->
+        <div id="web-loading" style="display: none; text-align: center; padding: 40px 0;">
+          <div style="display: inline-block; width: 42px; height: 42px; border: 3px solid rgba(14, 165, 233, 0.2); border-top-color: #38bdf8; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+          <p style="color: #38bdf8; font-weight: 600; margin-top: 14px; font-size: 0.95rem;">Extrayendo metadatos y enlaces del video...</p>
+        </div>
+
+        <!-- MENSAJE DE ERROR -->
+        <div id="web-error" style="display: none; margin-top: 20px; padding: 14px 20px; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 12px; color: #fca5a5; font-size: 0.9rem; text-align: center;"></div>
+
+        <!-- RESULTADO DE ANÁLISIS -->
+        <div id="web-result" class="web-result-box">
+          <div class="web-result-inner">
+            
+            <!-- Columna Miniatura / Previsualizador -->
+            <div>
+              <div class="web-thumb-wrap">
+                <img id="res-thumb" src="" alt="Miniatura" />
+              </div>
+              <div id="res-player-wrap" style="display: none; margin-top: 12px;"></div>
+              <button id="res-preview-btn" class="btn btn-secondary" style="width: 100%; margin-top: 12px; font-size: 0.85rem; padding: 8px 12px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                <span>Reproducir en Navegador</span>
+              </button>
+            </div>
+
+            <!-- Columna Información y Acciones -->
+            <div class="web-info-wrap">
+              <div>
+                <div style="display: flex; gap: 8px; margin-bottom: 8px; align-items: center; flex-wrap: wrap;">
+                  <span id="res-platform" style="background: rgba(14, 165, 233, 0.2); color: #38bdf8; font-weight: 700; font-size: 0.72rem; padding: 2px 10px; border-radius: 6px; text-transform: uppercase;">YouTube</span>
+                  <span style="background: rgba(16, 185, 129, 0.15); color: #10b981; font-weight: 700; font-size: 0.72rem; padding: 2px 10px; border-radius: 6px;">● Listo para Descargar</span>
+                </div>
+                <h3 id="res-title" style="font-size: 1.25rem; font-weight: 700; line-height: 1.35; margin-bottom: 8px;">Título del Video</h3>
+                <p id="res-author" style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 18px;">Canal o Creador</p>
+              </div>
+
+              <!-- OPCIONES DISPONIBLES EN WEB LITE -->
+              <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px; margin-bottom: 16px;">
+                <p style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: #10b981; margin-bottom: 10px;">Descargas Disponibles en Web Lite (Calidad Estándar)</p>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                  <button id="res-dl-video" class="btn btn-primary" style="padding: 9px 16px; font-size: 0.88rem;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    <span>Descargar Video MP4</span>
+                  </button>
+                  <button id="res-dl-audio" class="btn btn-secondary" style="padding: 9px 16px; font-size: 0.88rem;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+                    <span>Descargar Audio Web</span>
+                  </button>
+                  <button id="res-thumb-download" class="btn btn-secondary" style="padding: 9px 14px; font-size: 0.88rem;" title="Descargar carátula original en alta resolución">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    <span>Carátula HD</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- FUNCIONES PRO BLOQUEADAS (GANCHO A LA APP) -->
+              <div>
+                <p style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: #f59e0b; margin-bottom: 8px;">🌟 Funciones S-Tier Bloqueadas (Requieren App Pro de Escritorio):</p>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                  <button class="locked-badge" onclick="abrirModalPro('Calidad 4K / 8K a 60 FPS con Ensamblado FFmpeg')">
+                    <span>🔒 4K / 8K a 60 FPS</span>
+                  </button>
+                  <button class="locked-badge" onclick="abrirModalPro('Conversión Real a MP3 (320 kbps) con Etiquetas ID3 y Carátula')">
+                    <span>🔒 MP3 320 kbps + ID3</span>
+                  </button>
+                  <button class="locked-badge" onclick="abrirModalPro('Recorte por Fotogramas de Tiempo (Trim de Fragmentos)')">
+                    <span>🔒 Recorte de Tiempo</span>
+                  </button>
+                  <button class="locked-badge" onclick="abrirModalPro('Descargas Simultáneas en Cola Multihilo (Hasta 4x)')">
+                    <span>🔒 Cola Paralela 4x</span>
+                  </button>
+                  <button class="locked-badge" onclick="abrirModalPro('Bypass de Cookies de Navegador (+18 y Playlists Privadas)')">
+                    <span>🔒 Cookies (+18)</span>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- BANNER DE UPGRADE -->
+        <div style="margin-top: 24px; padding: 18px 24px; background: rgba(14, 165, 233, 0.06); border: 1px solid rgba(14, 165, 233, 0.2); border-radius: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+          <div>
+            <h4 style="font-size: 1rem; font-weight: 700; color: #f8fafc; margin-bottom: 2px;">¿Quieres toda la potencia sin límites del navegador?</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Descarga gratis la app para Windows, Mac o Linux y obtén 4K real, MP3 a 320 kbps, recorte y descargas masivas.</p>
+          </div>
+          <a href="#install" class="btn btn-primary" style="padding: 10px 18px; font-size: 0.88rem;">
+            <span>Descargar App Completa</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+          </a>
+        </div>
+
+      </div>
+
     </div>
   </section>
 
@@ -960,6 +1274,31 @@
     </div>
   </footer>
 
+  <!-- MODAL UPGRADE PRO -->
+  <div id="modal-pro" class="modal-overlay" onclick="if(event.target === this) cerrarModalPro();">
+    <div class="modal-card">
+      <div style="width: 56px; height: 56px; border-radius: 16px; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; color: #f59e0b;">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+      </div>
+      <h3 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 8px;">Función Exclusiva de Media Downloader Pro</h3>
+      <p id="modal-feature-title" style="font-size: 0.95rem; color: #38bdf8; font-weight: 700; margin-bottom: 16px;"></p>
+      <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px;">
+        Esta función requiere procesamiento pesado en local utilizando el motor <strong>FFmpeg y yt-dlp</strong> sin las limitaciones de compresión ni ancho de banda de un navegador web.
+        <br /><br />
+        ¡Descarga la <strong>App de Escritorio 100% Gratis</strong> para Windows, Linux o Mac y disfruta de toda la potencia S-Tier con cero límites!
+      </p>
+      <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+        <a href="#install" onclick="cerrarModalPro();" class="btn btn-primary" style="padding: 12px 24px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          <span>Descargar App Gratis</span>
+        </a>
+        <button onclick="cerrarModalPro()" class="btn btn-secondary" style="padding: 12px 20px;">
+          <span>Seguir en Web Lite</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     function cambiarTema(tema) {
       const hero = document.getElementById('hero-img');
@@ -981,7 +1320,7 @@
     }
 
     function copiarComando() {
-      const code = "git clone https://github.com/EmersonGt124/Media_Video_Downloader_V1.0.git && cd Media_Video_Downloader_V1.0 && pip install pillow sv-ttk && cd PROYECTO && python3 Media_Downloader.py";
+      const code = "git clone https://github.com/EmersonGt124/Media_Video_Downloader_V1.0.git && cd Media_Video_Downloader_V1.0 && pip install -r requirements.txt && cd PROYECTO && python3 Media_Downloader.py";
       navigator.clipboard.writeText(code).then(() => {
         const lbl = document.getElementById('copy-label');
         lbl.innerText = "¡Copiado!";
@@ -989,6 +1328,166 @@
           lbl.innerText = "Copiar comandos";
         }, 2000);
       });
+    }
+
+    // MODAL PRO LOGIC
+    function abrirModalPro(tituloFuncion) {
+      const modal = document.getElementById('modal-pro');
+      const titleElem = document.getElementById('modal-feature-title');
+      if (titleElem) titleElem.textContent = `Has seleccionado: ${tituloFuncion}`;
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function cerrarModalPro() {
+      const modal = document.getElementById('modal-pro');
+      if (modal) modal.style.display = 'none';
+    }
+
+    // PEGAR DEL PORTAPAPELES
+    async function pegarDelPortapapeles() {
+      try {
+        const text = await navigator.clipboard.readText();
+        if (text) {
+          const input = document.getElementById('web-url-input');
+          input.value = text.trim();
+          analizarEnlaceWeb(input.value);
+        }
+      } catch (err) {
+        const input = document.getElementById('web-url-input');
+        input.focus();
+        input.select();
+      }
+    }
+
+    // CARGAR EJEMPLO RÁPIDO
+    function cargarEjemplo(url) {
+      const input = document.getElementById('web-url-input');
+      input.value = url;
+      analizarEnlaceWeb(url);
+    }
+
+    // ANÁLISIS EN VIVO DEL ENLACE EN LA WEB
+    async function analizarEnlaceWeb(urlManual) {
+      const urlInput = document.getElementById('web-url-input');
+      const url = (urlManual || urlInput.value || '').trim();
+      
+      if (!url) {
+        alert('Por favor ingresa o pega un enlace válido.');
+        return;
+      }
+
+      const loading = document.getElementById('web-loading');
+      const resultBox = document.getElementById('web-result');
+      const errorBox = document.getElementById('web-error');
+      const btnAnalizar = document.getElementById('btn-analizar-web');
+
+      loading.style.display = 'block';
+      resultBox.style.display = 'none';
+      errorBox.style.display = 'none';
+      btnAnalizar.disabled = true;
+
+      try {
+        const ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i);
+        let title = '';
+        let author = '';
+        let thumb = '';
+        let embedUrl = '';
+        let platform = 'Web';
+        let videoId = ytMatch ? ytMatch[1] : null;
+
+        if (videoId) {
+          platform = 'YouTube';
+          thumb = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+          embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1`;
+
+          try {
+            const resp = await fetch(`https://noembed.com/embed?url=${encodeURIComponent(url)}`);
+            if (resp.ok) {
+              const data = await resp.json();
+              if (data.title) title = data.title;
+              if (data.author_name) author = data.author_name;
+              if (data.thumbnail_url) thumb = data.thumbnail_url;
+            }
+          } catch (e) {
+            console.warn('Fallback noembed:', e);
+          }
+          if (!title) title = `Video de YouTube (${videoId})`;
+          if (!author) author = 'Canal de YouTube';
+        } else {
+          try {
+            const resp = await fetch(`https://noembed.com/embed?url=${encodeURIComponent(url)}`);
+            if (resp.ok) {
+              const data = await resp.json();
+              title = data.title || 'Video Detectado';
+              author = data.author_name || 'Creador de Contenido';
+              thumb = data.thumbnail_url || 'assets/preview_dark.png';
+              platform = data.provider_name || 'Multimedia';
+            }
+          } catch (e) {}
+
+          if (!title) {
+            title = 'Contenido Multimedia Detectado';
+            author = 'Enlace externo';
+            thumb = 'assets/preview_dark.png';
+          }
+        }
+
+        // Renderizar datos
+        document.getElementById('res-title').textContent = title;
+        document.getElementById('res-author').textContent = author;
+        document.getElementById('res-platform').textContent = platform;
+        
+        const imgElem = document.getElementById('res-thumb');
+        imgElem.src = thumb;
+
+        // Configurar botón descargar carátula HD
+        document.getElementById('res-thumb-download').onclick = () => {
+          window.open(thumb, '_blank');
+        };
+
+        // Configurar reproductor preview
+        const previewBtn = document.getElementById('res-preview-btn');
+        const playerContainer = document.getElementById('res-player-wrap');
+        if (embedUrl) {
+          previewBtn.style.display = 'inline-flex';
+          previewBtn.onclick = () => {
+            playerContainer.innerHTML = `<iframe src="${embedUrl}" style="width:100%; height:240px; border:none; border-radius:12px;" allowfullscreen allow="autoplay"></iframe>`;
+            playerContainer.style.display = 'block';
+            previewBtn.style.display = 'none';
+          };
+        } else {
+          previewBtn.style.display = 'none';
+          playerContainer.style.display = 'none';
+        }
+
+        // Configurar botones de descarga en Web Lite
+        document.getElementById('res-dl-video').onclick = () => {
+          if (videoId) {
+            window.open(`https://www.ssyoutube.com/watch?v=${videoId}`, '_blank');
+          } else {
+            window.open(`https://9xbuddy.com/process?url=${encodeURIComponent(url)}`, '_blank');
+          }
+        };
+
+        document.getElementById('res-dl-audio').onclick = () => {
+          if (videoId) {
+            window.open(`https://y2mate.nu/es/youtube/${videoId}`, '_blank');
+          } else {
+            window.open(`https://9xbuddy.com/process?url=${encodeURIComponent(url)}`, '_blank');
+          }
+        };
+
+        loading.style.display = 'none';
+        resultBox.style.display = 'block';
+        btnAnalizar.disabled = false;
+
+      } catch (err) {
+        console.error(err);
+        loading.style.display = 'none';
+        btnAnalizar.disabled = false;
+        errorBox.textContent = 'No se pudo analizar el enlace. Por favor verifica que la URL sea pública y válida.';
+        errorBox.style.display = 'block';
+      }
     }
   </script>
 </body>
