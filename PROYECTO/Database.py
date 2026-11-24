@@ -30,7 +30,6 @@ class Database:
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
-            # Intentar agregar columna filepath si no existía previamente
             try:
                 cursor.execute("ALTER TABLE downloads ADD COLUMN filepath TEXT DEFAULT ''")
             except Exception:
@@ -99,6 +98,29 @@ class Database:
             return [tuple(r) for r in rows]
 
     @classmethod
+    def get_filtered(cls, status: str = "Todos", search_query: str = "") -> List[Tuple[Any, ...]]:
+        """Obtiene registros filtrados por estado y búsqueda por título o canal."""
+        cls.init_db()
+        with cls.get_connection() as conn:
+            cursor = conn.cursor()
+            query = "SELECT id, title, duration, status, link, thumbnail, uploader, filepath FROM downloads WHERE 1=1"
+            params = []
+
+            if status and status != "Todos":
+                query += " AND status = ?"
+                params.append(status)
+
+            if search_query and search_query.strip():
+                query += " AND (title LIKE ? OR uploader LIKE ?)"
+                like_term = f"%{search_query.strip()}%"
+                params.extend([like_term, like_term])
+
+            query += " ORDER BY id ASC"
+            cursor.execute(query, params)
+            rows = cursor.fetchall()
+            return [tuple(r) for r in rows]
+
+    @classmethod
     def get_item_by_id(cls, item_id: int) -> Optional[Dict[str, Any]]:
         cls.init_db()
         with cls.get_connection() as conn:
@@ -119,6 +141,14 @@ class Database:
             conn.commit()
 
     @classmethod
+    def reset_status_by_id(cls, item_id: int, new_status: str = "Pendiente"):
+        cls.init_db()
+        with cls.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("UPDATE downloads SET status = ? WHERE id = ?", (new_status, item_id))
+            conn.commit()
+
+    @classmethod
     def delete_by_id(cls, item_id: int):
         cls.init_db()
         with cls.get_connection() as conn:
@@ -127,11 +157,31 @@ class Database:
             conn.commit()
 
     @classmethod
+    def delete_batch_ids(cls, item_ids: List[int]):
+        if not item_ids:
+            return
+        cls.init_db()
+        with cls.get_connection() as conn:
+            cursor = conn.cursor()
+            placeholders = ",".join("?" * len(item_ids))
+            cursor.execute(f"DELETE FROM downloads WHERE id IN ({placeholders})", item_ids)
+            conn.commit()
+
+    @classmethod
     def delete_by_link(cls, link: str):
         cls.init_db()
         with cls.get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("DELETE FROM downloads WHERE link = ?", (link,))
+            conn.commit()
+
+    @classmethod
+    def clear_completed(cls):
+        """Elimina solo los elementos con estado 'Terminado'."""
+        cls.init_db()
+        with cls.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM downloads WHERE status = 'Terminado'")
             conn.commit()
 
     @classmethod

@@ -24,6 +24,10 @@ combo_velocidad = None
 combo_cookies = None
 combo_paralelo = None
 
+# Filtros del historial
+combo_filtro_estado = None
+entry_filtro_texto = None
+
 # Variables de checkboxes
 chk_metadata_var = None
 chk_subtitles_var = None
@@ -51,6 +55,7 @@ def Centro_youtube(parent_frame):
     """Construye la vista moderna, responsiva y completa con todas las herramientas élite."""
     global entry_url, lbl_preview_title, lbl_preview_meta, lbl_preview_thumb
     global combo_formato, combo_calidad, combo_velocidad, combo_cookies, combo_paralelo
+    global combo_filtro_estado, entry_filtro_texto
     global chk_metadata_var, chk_subtitles_var, chk_trim_var, chk_notify_var, chk_open_finish_var, chk_suspend_finish_var
     global frame_trim_inputs, entry_trim_start, entry_trim_end
     global frame_progreso, pbar, lbl_progreso_pct, lbl_progreso_detalles, lbl_progreso_titulo, btn_cancelar
@@ -99,7 +104,7 @@ def Centro_youtube(parent_frame):
     btn_web.pack(side="left")
 
     # ==========================================
-    # 2. TARJETA DE VISTA PREVIA Y HERRAMIENTAS ÉLITE
+    # 2. TARJETA DE VISTA PREVIA Y HERRAMIENTAS
     # ==========================================
     card_preview = ttk.LabelFrame(container, text=" Previsualización y Configuración Avanzada ", padding=(8, 6))
     card_preview.pack(fill="x", pady=(0, 5))
@@ -107,7 +112,6 @@ def Centro_youtube(parent_frame):
     frame_prev_inner = ttk.Frame(card_preview)
     frame_prev_inner.pack(fill="x")
 
-    # Miniatura
     frame_thumb = ttk.Frame(frame_prev_inner, width=155, height=88)
     frame_thumb.pack(side="left", padx=(0, 10))
     frame_thumb.pack_propagate(False)
@@ -115,7 +119,6 @@ def Centro_youtube(parent_frame):
     lbl_preview_thumb = ttk.Label(frame_thumb, text="Sin vista previa", anchor="center")
     lbl_preview_thumb.pack(fill="both", expand=True)
 
-    # Detalles
     frame_detalles = ttk.Frame(frame_prev_inner)
     frame_detalles.pack(side="left", fill="both", expand=True)
 
@@ -141,7 +144,7 @@ def Centro_youtube(parent_frame):
     )
     lbl_preview_meta.pack(anchor="w", pady=(0, 4))
 
-    # Fila 1 de opciones: Formato, Calidad, Límite de Velocidad y Cookies
+    # Fila 1: Formato, Calidad, Límite de Velocidad y Cookies
     frame_combos = ttk.Frame(frame_detalles)
     frame_combos.pack(anchor="w", pady=(0, 3))
 
@@ -181,7 +184,7 @@ def Centro_youtube(parent_frame):
     combo_cookies = ttk.Combobox(frame_combos, textvariable=cookies_var, values=cookies_opts, state="readonly", width=9)
     combo_cookies.pack(side="left")
 
-    # Fila 2 de opciones: Checkboxes con Recorte, Notificaciones y Auto-Abrir
+    # Fila 2: Checkboxes con Recorte, Notificaciones y Auto-Abrir
     frame_checks = ttk.Frame(frame_detalles)
     frame_checks.pack(anchor="w", pady=(0, 3))
 
@@ -203,7 +206,6 @@ def Centro_youtube(parent_frame):
     chk_trim = ttk.Checkbutton(frame_checks, text="✂️ Recortar", variable=chk_trim_var, command=on_toggle_trim)
     chk_trim.pack(side="left", padx=(0, 6))
 
-    # Entradas de tiempo de recorte
     frame_trim_inputs = ttk.Frame(frame_checks)
     ttk.Label(frame_trim_inputs, text="De:").pack(side="left", padx=(2, 2))
     entry_trim_start = ttk.Entry(frame_trim_inputs, width=5)
@@ -245,7 +247,7 @@ def Centro_youtube(parent_frame):
 
     btn_play_quick = ttk.Button(
         frame_action_btns,
-        text="▶ Reproducir Sel.",
+        text="▶ Reproducir",
         command=Botones_Funciones.reproducir_seleccionado
     )
     btn_play_quick.pack(side="left")
@@ -283,15 +285,57 @@ def Centro_youtube(parent_frame):
     lbl_progreso_detalles.pack(side="right")
 
     # ==========================================
-    # 4. COLA DE DESCARGAS E HISTORIAL
+    # 4. COLA DE DESCARGAS E HISTORIAL CON FILTROS
     # ==========================================
     card_cola = ttk.LabelFrame(container, text=" Cola de Descargas e Historial ", padding=(8, 5))
     card_cola.pack(fill="both", expand=True)
 
-    # Treeview
+    # BARRA SUPERIOR DE FILTROS Y BÚSQUEDA DEL HISTORIAL
+    frame_cola_filtros = ttk.Frame(card_cola)
+    frame_cola_filtros.pack(fill="x", pady=(0, 4))
+
+    # Filtro por estado
+    ttk.Label(frame_cola_filtros, text="Estado:").pack(side="left", padx=(0, 3))
+    filtro_estados = ["Todos", "Pendiente", "Descargando", "Terminado", "Error", "Cancelado"]
+    var_filtro_est = tk.StringVar(value="Todos")
+    combo_filtro_estado = ttk.Combobox(frame_cola_filtros, textvariable=var_filtro_est, values=filtro_estados, state="readonly", width=11)
+    combo_filtro_estado.pack(side="left", padx=(0, 8))
+
+    def on_filtro_estado_changed(event):
+        Botones_Funciones.aplicar_filtro_estado(var_filtro_est.get())
+
+    combo_filtro_estado.bind("<<ComboboxSelected>>", on_filtro_estado_changed)
+
+    # Buscador en tiempo real por título o canal
+    ttk.Label(frame_cola_filtros, text="Filtrar por nombre/canal:").pack(side="left", padx=(0, 3))
+    var_filtro_txt = tk.StringVar(value="")
+    entry_filtro_texto = ttk.Entry(frame_cola_filtros, textvariable=var_filtro_txt, width=20)
+    entry_filtro_texto.pack(side="left", fill="x", expand=True, padx=(0, 8))
+
+    def on_filtro_texto_changed(event):
+        Botones_Funciones.aplicar_filtro_texto(var_filtro_txt.get())
+
+    entry_filtro_texto.bind("<KeyRelease>", on_filtro_texto_changed)
+
+    # Botones rápidos de limpieza en la cabecera
+    btn_clean_done = ttk.Button(
+        frame_cola_filtros,
+        text="🧹 Limpiar Terminados",
+        command=Botones_Funciones.limpiar_completados
+    )
+    btn_clean_done.pack(side="right", padx=(4, 0))
+
+    btn_clean_all = ttk.Button(
+        frame_cola_filtros,
+        text="🗑️ Vaciar Todo",
+        command=Botones_Funciones.clear
+    )
+    btn_clean_all.pack(side="right")
+
+    # Treeview (con clic derecho y ordenación clicable)
     Botones_Funciones.crear_treeview(card_cola)
 
-    # Barra inferior con control de descargas paralelas
+    # BARRA INFERIOR DE ACCIONES Y DESCARGA
     frame_cola_btns = ttk.Frame(card_cola)
     frame_cola_btns.pack(fill="x", pady=(5, 0))
 
@@ -325,26 +369,25 @@ def Centro_youtube(parent_frame):
     )
     btn_abrir_destino.pack(side="left")
 
-    # Checkbox suspender al terminar la cola
     chk_suspend_finish_var = tk.BooleanVar(value=False)
     ttk.Checkbutton(frame_btns_left, text="💤 Suspender al terminar", variable=chk_suspend_finish_var).pack(side="left", padx=(8, 0))
 
     frame_btns_right = ttk.Frame(frame_cola_btns)
     frame_btns_right.pack(side="right")
 
+    btn_reintentar = ttk.Button(
+        frame_btns_right,
+        text="🔄 Reintentar",
+        command=Botones_Funciones.reintentar_seleccionados
+    )
+    btn_reintentar.pack(side="left", padx=(0, 4))
+
     btn_eliminar = ttk.Button(
         frame_btns_right,
-        text="🗑️ Quitar",
+        text="🗑️ Quitar Sel.",
         command=Botones_Funciones.eliminar_seleccionado
     )
-    btn_eliminar.pack(side="left", padx=(0, 4))
-
-    btn_limpiar = ttk.Button(
-        frame_btns_right,
-        text="🧹 Limpiar Cola",
-        command=Botones_Funciones.clear
-    )
-    btn_limpiar.pack(side="left")
+    btn_eliminar.pack(side="left")
 
     return container
 
@@ -373,7 +416,6 @@ def abrir_modal_buscador(query_inicial: str = ""):
     lbl_estado = ttk.Label(modal, text="Escribe una búsqueda y pulsa 'Buscar'...", font=("Helvetica", 9), foreground="#94a3b8")
     lbl_estado.pack(anchor="w", padx=12, pady=(0, 4))
 
-    # Treeview de resultados
     frame_m_results = ttk.Frame(modal, padding=(10, 0))
     frame_m_results.pack(fill="both", expand=True)
 
@@ -452,7 +494,6 @@ def abrir_modal_buscador(query_inicial: str = ""):
 # ==========================================
 
 def parsear_limite_velocidad() -> Optional[int]:
-    """Obtiene los bytes por segundo a partir del combobox de velocidad."""
     val = combo_velocidad.get() if combo_velocidad else "Ilimitada"
     if "10 MB" in val:
         return 10 * 1024 * 1024
@@ -465,7 +506,6 @@ def parsear_limite_velocidad() -> Optional[int]:
     return None
 
 def parsear_recorte_tiempo() -> Optional[tuple]:
-    """Obtiene el rango de tiempo de inicio y fin en segundos si el recorte está activado."""
     if not chk_trim_var.get():
         return None
     s_start = entry_trim_start.get().strip() if entry_trim_start else ""

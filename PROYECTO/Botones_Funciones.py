@@ -20,6 +20,10 @@ cancel_event = threading.Event()
 is_downloading = False
 thumbnail_cache = {}
 
+# Estados de filtrado del historial
+filtro_estado_actual = "Todos"
+filtro_texto_actual = ""
+
 def notificar_escritorio(titulo: str, mensaje: str):
     """Lanza una notificación nativa en el escritorio del sistema operativo."""
     try:
@@ -54,6 +58,14 @@ def reproducir_archivo(filepath: str):
             subprocess.Popen(["xdg-open", filepath])
     except Exception as e:
         Alertas.alerta_error(Variables.titulo, "Error al Reproducir", f"No se pudo abrir el reproductor:\n{e}")
+
+def abrir_ubicacion_archivo(filepath: str):
+    """Abre la carpeta contenedora y selecciona el archivo."""
+    if not filepath or not os.path.exists(filepath):
+        Alertas.alerta_Amarilla(Variables.titulo, "Ruta no encontrada", "El archivo todavía no existe en el disco.")
+        return
+    folder = os.path.dirname(filepath)
+    abrir_carpeta(folder)
 
 def abrir_carpeta(ruta: str):
     """Abre la carpeta en el explorador de archivos del sistema."""
@@ -117,14 +129,28 @@ def descargar_miniatura_async(url: str, callback: Callable[[Optional[ImageTk.Pho
     threading.Thread(target=_fetch, daemon=True).start()
 
 # ==========================================
-# GESTIÓN DEL TREEVIEW Y BASE DE DATOS
+# GESTIÓN DEL TREEVIEW, FILTROS Y ORDENAMIENTO
 # ==========================================
 
 treeview_ref = None
+context_menu = None
+
+def ordenar_columna(tree, col: str, reverse: bool):
+    """Ordena las filas del Treeview al hacer clic en las cabeceras."""
+    datos = [(tree.set(k, col), k) for k in tree.get_children('')]
+    try:
+        datos.sort(key=lambda t: int(t[0]), reverse=reverse)
+    except ValueError:
+        datos.sort(key=lambda t: t[0].lower(), reverse=reverse)
+
+    for index, (val, k) in enumerate(datos):
+        tree.move(k, '', index)
+
+    tree.heading(col, command=lambda: ordenar_columna(tree, col, not reverse))
 
 def crear_treeview(parent):
-    """Crea el Treeview con doble clic para reproducir directamente."""
-    global treeview_ref
+    """Crea el Treeview con soporte para selección múltiple, ordenación por columnas y menú contextual."""
+    global treeview_ref, context_menu
 
     frame_tv = ttk.Frame(parent)
     frame_tv.pack(fill="both", expand=True)
@@ -137,7 +163,7 @@ def crear_treeview(parent):
         frame_tv,
         columns=columns,
         show="headings",
-        selectmode="browse",
+        selectmode="extended",  # Permite seleccionar varios elementos con Ctrl/Shift
         yscrollcommand=scroll_y.set,
         xscrollcommand=scroll_x.set
     )
@@ -149,11 +175,12 @@ def crear_treeview(parent):
     scroll_x.pack(side="bottom", fill="x")
     tree.pack(side="left", fill="both", expand=True)
 
-    tree.heading("id", text="#")
-    tree.heading("title", text="Título del Video / Pista (Doble clic para reproducir)")
-    tree.heading("duration", text="Duración")
-    tree.heading("uploader", text="Canal / Artista")
-    tree.heading("status", text="Estado")
+    # Cabeceras con ordenamiento clicable
+    tree.heading("id", text="# ↕", command=lambda: ordenar_columna(tree, "id", False))
+    tree.heading("title", text="Título del Video / Pista (Clic para ordenar) ↕", command=lambda: ordenar_columna(tree, "title", False))
+    tree.heading("duration", text="Duración ↕", command=lambda: ordenar_columna(tree, "duration", False))
+    tree.heading("uploader", text="Canal / Artista ↕", command=lambda: ordenar_columna(tree, "uploader", False))
+    tree.heading("status", text="Estado ↕", command=lambda: ordenar_columna(tree, "status", False))
 
     tree.column("id", width=38, minwidth=35, anchor="center")
     tree.column("title", width=360, minwidth=180, anchor="w")
@@ -168,18 +195,49 @@ def crear_treeview(parent):
     tree.tag_configure("Cancelado", foreground="#94a3b8")
 
     # Doble clic para reproducir
-    def on_double_click(event):
-        reproducir_seleccionado()
+    tree.bind("<Double-1>", lambda e: reproducir_seleccionado())
 
-    tree.bind("<Double-1>", on_double_click)
+    # Menú Contextual (Clic derecho)
+    context_menu = tk.Menu(tree, tearoff=0)
+    context_menu.add_command(label="▶ Reproducir Archivo", command=reproducir_seleccionado)
+    context_menu.add_command(label="📂 Abrir Carpeta Contenedora", command=abrir_carpeta_seleccionado)
+    context_menu.add_command(label="🌐 Abrir Enlace en Navegador", command=abrir_enlace_seleccionado)
+    context_menu.add_command(label="📋 Copiar Enlace", command=copiar_enlace_seleccionado)
+    context_menu.add_command(label="🔄 Reintentar / Marcar Pendiente", command=reintentar_seleccionados)
+    context_menu.add_separator()
+    context_menu.add_command(label="🗑️ Eliminar de la Lista", command=eliminar_seleccionado)
+
+    def mostrar_menu_contextual(event):
+        item = tree.identify_row(event.y)
+        if item:
+            # Si el elemento no está en la selección actual, seleccionarlo
+            if item not in tree.selection():
+                tree.selection_set(item)
+            context_menu.post(event.x_root, event.y_root)
+
+    # Clic derecho en Linux/Windows (<Button-3>) y macOS (<Button-2>)
+    tree.bind("<Button-3>", mostrar_menu_contextual)
+    tree.bind("<Button-2>", mostrar_menu_contextual)
 
     treeview_ref = tree
     actualizar_treeview(tree)
     return tree
 
+def aplicar_filtro_estado(nuevo_estado: str):
+    """Filtra los elementos del historial por estado."""
+    global filtro_estado_actual
+    filtro_estado_actual = nuevo_estado
+    actualizar_treeview()
+
+def aplicar_filtro_texto(texto: str):
+    """Filtra en tiempo real los elementos del historial por título o canal."""
+    global filtro_texto_actual
+    filtro_texto_actual = texto.strip()
+    actualizar_treeview()
+
 def actualizar_treeview(tree=None):
-    """Actualiza la vista del Treeview leyendo desde SQLite."""
-    global treeview_ref
+    """Actualiza la vista del Treeview leyendo desde SQLite con filtros activos."""
+    global treeview_ref, filtro_estado_actual, filtro_texto_actual
     tv = tree or treeview_ref
     if not tv:
         return
@@ -187,7 +245,7 @@ def actualizar_treeview(tree=None):
     for row in tv.get_children():
         tv.delete(row)
 
-    registros = Database.get_all()
+    registros = Database.get_filtered(status=filtro_estado_actual, search_query=filtro_texto_actual)
     for item in registros:
         item_id = item[0]
         title = item[1]
@@ -202,6 +260,10 @@ def actualizar_treeview(tree=None):
             values=(item_id, title, duration, uploader, status),
             tags=(status,)
         )
+
+# ==========================================
+# ACCIONES SOBRE ELEMENTOS DEL HISTORIAL
+# ==========================================
 
 def reproducir_seleccionado():
     """Reproduce el elemento seleccionado si ya está descargado."""
@@ -226,31 +288,86 @@ def reproducir_seleccionado():
             "El archivo aún no ha terminado de descargarse o fue movido."
         )
 
-def clear(archivo_dummy=None):
-    """Limpia la base de datos y la vista."""
-    res = Alertas.alerta_aceptar(Variables.titulo, "Limpiar cola", "¿Estás seguro de que deseas vaciar toda la cola de descargas?")
-    if res == 1:
-        Database.clear_all()
-        actualizar_treeview()
-
-def eliminar_seleccionado():
-    """Elimina el elemento seleccionado de la cola."""
+def abrir_carpeta_seleccionado():
     if not treeview_ref:
         return
     seleccion = treeview_ref.selection()
     if not seleccion:
-        Alertas.alerta_Amarilla(Variables.titulo, "Eliminar", "Selecciona un elemento de la lista para eliminar.")
         return
     item_id = int(seleccion[0])
-    Database.delete_by_id(item_id)
+    item = Database.get_item_by_id(item_id)
+    if item and item.get('filepath'):
+        abrir_ubicacion_archivo(item['filepath'])
+    else:
+        abrir_carpeta(Variables.carpeta_descargas_default)
+
+def abrir_enlace_seleccionado():
+    if not treeview_ref:
+        return
+    seleccion = treeview_ref.selection()
+    if not seleccion:
+        return
+    item_id = int(seleccion[0])
+    item = Database.get_item_by_id(item_id)
+    if item and item.get('link'):
+        abrir_link(item['link'])
+
+def copiar_enlace_seleccionado():
+    if not treeview_ref:
+        return
+    seleccion = treeview_ref.selection()
+    if not seleccion:
+        return
+    item_id = int(seleccion[0])
+    item = Database.get_item_by_id(item_id)
+    if item and item.get('link') and Variables.root:
+        Variables.root.clipboard_clear()
+        Variables.root.clipboard_append(item['link'])
+        Alertas.alerta_ok(Variables.titulo, "Enlace Copiado", f"Enlace copiado al portapapeles:\n{item['link']}")
+
+def reintentar_seleccionados():
+    """Restablece el estado de los elementos seleccionados a 'Pendiente' para volver a descargarlos."""
+    if not treeview_ref:
+        return
+    seleccion = treeview_ref.selection()
+    if not seleccion:
+        return
+    for s in seleccion:
+        Database.reset_status_by_id(int(s), Variables.Pendiente)
     actualizar_treeview()
 
+def eliminar_seleccionado():
+    """Elimina uno o múltiples elementos seleccionados de la cola."""
+    if not treeview_ref:
+        return
+    seleccion = treeview_ref.selection()
+    if not seleccion:
+        Alertas.alerta_Amarilla(Variables.titulo, "Eliminar", "Selecciona uno o más elementos de la lista para eliminar.")
+        return
+
+    ids = [int(s) for s in seleccion]
+    Database.delete_batch_ids(ids)
+    actualizar_treeview()
+
+def limpiar_completados():
+    """Elimina de la lista solo los videos con estado 'Terminado'."""
+    res = Alertas.alerta_aceptar(Variables.titulo, "Limpiar Terminados", "¿Deseas eliminar del historial solo los videos ya completados?")
+    if res == 1:
+        Database.clear_completed()
+        actualizar_treeview()
+
+def clear(archivo_dummy=None):
+    """Vacía toda la lista de descargas e historial."""
+    res = Alertas.alerta_aceptar(Variables.titulo, "Vaciar Todo", "¿Estás seguro de que deseas vaciar completamente la cola y el historial?")
+    if res == 1:
+        Database.clear_all()
+        actualizar_treeview()
+
 # ==========================================
-# PROCESO DE DESCARGA EN SEGUNDO PLANO
+# DESCARGAS EN SEGUNDO PLANO
 # ==========================================
 
 def cancelar_descarga():
-    """Cancela la descarga que está activa actualmente."""
     global cancel_event, is_downloading
     if is_downloading:
         cancel_event.set()
@@ -271,7 +388,6 @@ def ejecutar_descarga(
     on_progress: Optional[Callable[[Dict[str, Any]], None]] = None,
     on_complete: Optional[Callable[[bool, str, str], None]] = None
 ):
-    """Ejecuta una descarga individual en un hilo dedicado."""
     global is_downloading, cancel_event
     cancel_event.clear()
     is_downloading = True
@@ -345,7 +461,6 @@ def ejecutar_descarga_cola(
     on_progress: Optional[Callable[[Dict[str, Any]], None]] = None,
     on_complete: Optional[Callable[[int, int], None]] = None
 ):
-    """Descarga los videos pendientes con soporte para descargas simultáneas en paralelo."""
     global is_downloading, cancel_event
     cancel_event.clear()
     is_downloading = True
@@ -417,7 +532,7 @@ def ejecutar_descarga_cola(
 
     threading.Thread(target=_worker, daemon=True).start()
 
-# Compatibilidad con código legado
+# Compatibilidad con código previo
 def crear_excel_lista(datos, dummy=None):
     pass
 def crear_excel_video(datos, dummy=None):
