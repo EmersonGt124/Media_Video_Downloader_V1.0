@@ -42,16 +42,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # Windows: Descargar FFmpeg estático para integrarlo en el paquete
-      - name: Integrar FFmpeg para Windows
+      # Windows: Instalar FFmpeg
+      - name: Instalar FFmpeg en Windows
         if: matrix.platform == 'windows'
-        shell: pwsh
         run: |
-          Invoke-WebRequest -Uri "https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip" -OutFile "ffmpeg.zip"
-          Expand-Archive -Path "ffmpeg.zip" -DestinationPath "ffmpeg_temp"
-          New-Item -ItemType Directory -Force -Path "PROYECTO/lib/ffmpeg"
-          Get-ChildItem -Path "ffmpeg_temp" -Filter "ffmpeg.exe" -Recurse | Copy-Item -Destination "PROYECTO/lib/ffmpeg/ffmpeg.exe"
-          Get-ChildItem -Path "ffmpeg_temp" -Filter "ffprobe.exe" -Recurse | Copy-Item -Destination "PROYECTO/lib/ffmpeg/ffprobe.exe"
+          choco install ffmpeg -y
 
       # Linux: Instalar FFmpeg
       - name: Instalar FFmpeg en Linux

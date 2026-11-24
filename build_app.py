@@ -26,8 +26,40 @@ def clean():
             print(f"Limpiando {d}...")
             shutil.rmtree(d, ignore_errors=True)
 
+def prepare_ffmpeg():
+    """Detecta FFmpeg en el sistema y lo copia a PROYECTO/lib/ffmpeg si existe."""
+    ffmpeg_dir = os.path.join(PROYECTO_DIR, "lib", "ffmpeg")
+    os.makedirs(ffmpeg_dir, exist_ok=True)
+
+    system = platform.system().lower()
+    bin_ext = ".exe" if system == "windows" else ""
+
+    for tool in ["ffmpeg", "ffprobe"]:
+        target = os.path.join(ffmpeg_dir, f"{tool}{bin_ext}")
+        if not os.path.exists(target):
+            sys_path = shutil.which(tool)
+            if not sys_path and system == "windows":
+                common_paths = [
+                    rf"C:\ProgramData\chocolatey\bin\{tool}.exe",
+                    rf"C:\ProgramData\chocolatey\lib\ffmpeg\tools\ffmpeg\bin\{tool}.exe",
+                    rf"C:\tools\ffmpeg\bin\{tool}.exe",
+                ]
+                for cp in common_paths:
+                    if os.path.isfile(cp):
+                        sys_path = cp
+                        break
+            if sys_path:
+                real_p = os.path.realpath(sys_path)
+                if os.path.isfile(real_p):
+                    print(f"Copiando {tool} desde {real_p} a {target}...")
+                    try:
+                        shutil.copy2(real_p, target)
+                    except Exception as e:
+                        print(f"Aviso al copiar {tool}: {e}")
+
 def run_pyinstaller():
     """Ejecuta PyInstaller con todos los argumentos requeridos."""
+    prepare_ffmpeg()
     system = platform.system().lower()
     sep = ";" if system == "windows" else ":"
 
@@ -47,7 +79,7 @@ def run_pyinstaller():
 
     # Incluir FFmpeg si está en lib/ffmpeg
     ffmpeg_dir = os.path.join(PROYECTO_DIR, "lib", "ffmpeg")
-    if os.path.isdir(ffmpeg_dir):
+    if os.path.isdir(ffmpeg_dir) and os.listdir(ffmpeg_dir):
         print(f"Incluyendo binarios de FFmpeg desde {ffmpeg_dir}...")
         cmd.append(f"--add-data={ffmpeg_dir}{sep}lib/ffmpeg")
 
