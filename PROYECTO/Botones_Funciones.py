@@ -8,7 +8,8 @@ import io
 import tkinter as tk
 from tkinter import ttk, filedialog
 from PIL import Image, ImageTk
-from typing import Optional, Callable, Dict, Any, List
+from typing import Optional, Callable, Dict, Any, List, Tuple
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import Variables
 import Alertas
@@ -17,9 +18,42 @@ from Downloader_Engine import DownloaderEngine, format_seconds, format_bytes, cl
 
 cancel_event = threading.Event()
 is_downloading = False
-current_download_thread = None
-
 thumbnail_cache = {}
+
+def notificar_escritorio(titulo: str, mensaje: str):
+    """Lanza una notificación nativa en el escritorio del sistema operativo."""
+    try:
+        if sys.platform == "linux":
+            icon_arg = ["-i", Variables.icono_v] if os.path.exists(Variables.icono_v) else []
+            subprocess.run(["notify-send", "-a", "Media Downloader Pro", *icon_arg, titulo, mensaje], check=False)
+        elif sys.platform == "win32":
+            try:
+                from win10toast import ToastNotifier
+                toaster = ToastNotifier()
+                toaster.show_toast(titulo, mensaje, duration=4, threaded=True)
+            except Exception:
+                pass
+        elif sys.platform == "darwin":
+            script = f'display notification "{mensaje}" with title "{titulo}"'
+            subprocess.run(["osascript", "-e", script], check=False)
+    except Exception as e:
+        print(f"Aviso notificación: {e}")
+
+def reproducir_archivo(filepath: str):
+    """Abre el archivo descargado directamente con el reproductor multimedia predeterminado."""
+    if not filepath or not os.path.exists(filepath):
+        Alertas.alerta_Amarilla(Variables.titulo, "Archivo no encontrado", "El archivo no se encuentra en el disco o aún no ha sido descargado.")
+        return
+
+    try:
+        if sys.platform == "win32":
+            os.startfile(filepath)
+        elif sys.platform == "darwin":
+            subprocess.Popen(["open", filepath])
+        else:
+            subprocess.Popen(["xdg-open", filepath])
+    except Exception as e:
+        Alertas.alerta_error(Variables.titulo, "Error al Reproducir", f"No se pudo abrir el reproductor:\n{e}")
 
 def abrir_carpeta(ruta: str):
     """Abre la carpeta en el explorador de archivos del sistema."""
@@ -51,7 +85,7 @@ def abrir_link(consulta: str):
     except Exception as e:
         print("Error al abrir navegador:", e)
 
-def descargar_miniatura_async(url: str, callback: Callable[[Optional[ImageTk.PhotoImage]], None], size=(160, 90)):
+def descargar_miniatura_async(url: str, callback: Callable[[Optional[ImageTk.PhotoImage]], None], size=(155, 88)):
     """Descarga una miniatura en segundo plano sin congelar la interfaz."""
     if not url:
         callback(None)
@@ -89,7 +123,7 @@ def descargar_miniatura_async(url: str, callback: Callable[[Optional[ImageTk.Pho
 treeview_ref = None
 
 def crear_treeview(parent):
-    """Crea y estiliza el Treeview de la cola de descargas con scrollbars responsivas."""
+    """Crea el Treeview con doble clic para reproducir directamente."""
     global treeview_ref
 
     frame_tv = ttk.Frame(parent)
@@ -116,14 +150,14 @@ def crear_treeview(parent):
     tree.pack(side="left", fill="both", expand=True)
 
     tree.heading("id", text="#")
-    tree.heading("title", text="Título del Video / Pista")
+    tree.heading("title", text="Título del Video / Pista (Doble clic para reproducir)")
     tree.heading("duration", text="Duración")
     tree.heading("uploader", text="Canal / Artista")
     tree.heading("status", text="Estado")
 
-    tree.column("id", width=40, minwidth=35, anchor="center")
+    tree.column("id", width=38, minwidth=35, anchor="center")
     tree.column("title", width=360, minwidth=180, anchor="w")
-    tree.column("duration", width=80, minwidth=60, anchor="center")
+    tree.column("duration", width=75, minwidth=60, anchor="center")
     tree.column("uploader", width=140, minwidth=100, anchor="w")
     tree.column("status", width=110, minwidth=80, anchor="center")
 
@@ -132,6 +166,12 @@ def crear_treeview(parent):
     tree.tag_configure("Pendiente", foreground="#f59e0b")
     tree.tag_configure("Error", foreground="#ef4444")
     tree.tag_configure("Cancelado", foreground="#94a3b8")
+
+    # Doble clic para reproducir
+    def on_double_click(event):
+        reproducir_seleccionado()
+
+    tree.bind("<Double-1>", on_double_click)
 
     treeview_ref = tree
     actualizar_treeview(tree)
@@ -161,6 +201,29 @@ def actualizar_treeview(tree=None):
             iid=str(item_id),
             values=(item_id, title, duration, uploader, status),
             tags=(status,)
+        )
+
+def reproducir_seleccionado():
+    """Reproduce el elemento seleccionado si ya está descargado."""
+    if not treeview_ref:
+        return
+    seleccion = treeview_ref.selection()
+    if not seleccion:
+        Alertas.alerta_Amarilla(Variables.titulo, "Reproducir", "Selecciona un elemento de la lista para reproducir.")
+        return
+    item_id = int(seleccion[0])
+    item = Database.get_item_by_id(item_id)
+    if not item:
+        return
+
+    fpath = item.get('filepath', '')
+    if item.get('status') == Variables.Terminado and fpath and os.path.exists(fpath):
+        reproducir_archivo(fpath)
+    else:
+        Alertas.alerta_Amarilla(
+            Variables.titulo,
+            "No disponible",
+            "El archivo aún no ha terminado de descargarse o fue movido."
         )
 
 def clear(archivo_dummy=None):
@@ -200,10 +263,15 @@ def ejecutar_descarga(
     embed_metadata: bool,
     embed_thumbnail: bool,
     download_subtitles: bool,
-    on_progress: Callable[[Dict[str, Any]], None],
-    on_complete: Callable[[bool, str], None]
+    time_range: Optional[Tuple[int, int]] = None,
+    rate_limit_bytes: Optional[int] = None,
+    cookies_browser: Optional[str] = None,
+    open_on_finish: bool = False,
+    notify_on_finish: bool = True,
+    on_progress: Optional[Callable[[Dict[str, Any]], None]] = None,
+    on_complete: Optional[Callable[[bool, str, str], None]] = None
 ):
-    """Ejecuta una descarga individual en un hilo dedicado con yt-dlp y FFmpeg."""
+    """Ejecuta una descarga individual en un hilo dedicado."""
     global is_downloading, cancel_event
     cancel_event.clear()
     is_downloading = True
@@ -212,11 +280,12 @@ def ejecutar_descarga(
         global is_downloading
         success = False
         message = ""
+        final_path = ""
         try:
             Database.update_status(url, Variables.Descargando)
             Variables.root.after(0, actualizar_treeview)
 
-            title, warning = DownloaderEngine.download(
+            title, warning, final_path = DownloaderEngine.download(
                 url=url,
                 output_dir=output_dir,
                 format_type=format_type,
@@ -224,15 +293,25 @@ def ejecutar_descarga(
                 embed_metadata=embed_metadata,
                 embed_thumbnail=embed_thumbnail,
                 download_subtitles=download_subtitles,
-                progress_callback=lambda d: Variables.root.after(0, lambda: on_progress(d)),
+                time_range=time_range,
+                rate_limit_bytes=rate_limit_bytes,
+                cookies_browser=cookies_browser,
+                progress_callback=lambda d: Variables.root.after(0, lambda: on_progress(d)) if on_progress else None,
                 cancel_event=cancel_event
             )
-            Database.update_status(url, Variables.Terminado)
+            Database.update_status(url, Variables.Terminado, filepath=final_path)
             success = True
+
             if warning:
                 message = f"Descarga finalizada:\n{title}\n\nGuardado en:\n{output_dir}\n\n{warning}"
             else:
                 message = f"Descarga finalizada con éxito:\n{title}\n\nGuardado en:\n{output_dir}"
+
+            if notify_on_finish:
+                notificar_escritorio("✅ Descarga Completa", f"{title}\nGuardado en descargas.")
+
+            if open_on_finish and final_path and os.path.exists(final_path):
+                reproducir_archivo(final_path)
 
         except Exception as e:
             err_str = clean_ansi(str(e))
@@ -245,7 +324,8 @@ def ejecutar_descarga(
         finally:
             is_downloading = False
             Variables.root.after(0, actualizar_treeview)
-            Variables.root.after(0, lambda: on_complete(success, message))
+            if on_complete:
+                Variables.root.after(0, lambda: on_complete(success, message, final_path))
 
     threading.Thread(target=_worker, daemon=True).start()
 
@@ -256,10 +336,16 @@ def ejecutar_descarga_cola(
     embed_metadata: bool,
     embed_thumbnail: bool,
     download_subtitles: bool,
-    on_progress: Callable[[Dict[str, Any]], None],
-    on_complete: Callable[[int, int], None]
+    time_range: Optional[Tuple[int, int]] = None,
+    rate_limit_bytes: Optional[int] = None,
+    cookies_browser: Optional[str] = None,
+    concurrency: int = 1,
+    notify_on_finish: bool = True,
+    suspend_on_finish: bool = False,
+    on_progress: Optional[Callable[[Dict[str, Any]], None]] = None,
+    on_complete: Optional[Callable[[int, int], None]] = None
 ):
-    """Descarga secuencialmente todos los videos pendientes en la cola."""
+    """Descarga los videos pendientes con soporte para descargas simultáneas en paralelo."""
     global is_downloading, cancel_event
     cancel_event.clear()
     is_downloading = True
@@ -270,17 +356,16 @@ def ejecutar_descarga_cola(
         total = len(pendientes)
         completados = 0
 
-        for idx, item in enumerate(pendientes, start=1):
+        def _download_single(item):
+            nonlocal completados
             if cancel_event.is_set():
-                break
-
+                return
             url = item['link']
-            title = item['title']
             try:
                 Database.update_status(url, Variables.Descargando)
                 Variables.root.after(0, actualizar_treeview)
 
-                title_dl, warning = DownloaderEngine.download(
+                _, _, fpath = DownloaderEngine.download(
                     url=url,
                     output_dir=output_dir,
                     format_type=format_type,
@@ -288,28 +373,51 @@ def ejecutar_descarga_cola(
                     embed_metadata=embed_metadata,
                     embed_thumbnail=embed_thumbnail,
                     download_subtitles=download_subtitles,
-                    progress_callback=lambda d: Variables.root.after(0, lambda: on_progress(d)),
+                    time_range=time_range,
+                    rate_limit_bytes=rate_limit_bytes,
+                    cookies_browser=cookies_browser,
+                    progress_callback=lambda d: Variables.root.after(0, lambda: on_progress(d)) if on_progress else None,
                     cancel_event=cancel_event
                 )
-                Database.update_status(url, Variables.Terminado)
+                Database.update_status(url, Variables.Terminado, filepath=fpath)
                 completados += 1
             except Exception as e:
                 err_str = clean_ansi(str(e))
                 if "DESCARGA_CANCELADA_POR_USUARIO" in err_str:
                     Database.update_status(url, Variables.Cancelado)
-                    break
                 else:
                     Database.update_status(url, Variables.Error)
+            finally:
+                Variables.root.after(0, actualizar_treeview)
 
-            Variables.root.after(0, actualizar_treeview)
+        workers_count = max(1, min(concurrency, 4))
+        with ThreadPoolExecutor(max_workers=workers_count) as executor:
+            futures = [executor.submit(_download_single, item) for item in pendientes]
+            for f in as_completed(futures):
+                if cancel_event.is_set():
+                    break
 
         is_downloading = False
         Variables.root.after(0, actualizar_treeview)
-        Variables.root.after(0, lambda: on_complete(completados, total))
+
+        if notify_on_finish:
+            notificar_escritorio("✅ Cola de Descargas Completada", f"Se descargaron {completados} de {total} videos.")
+
+        if on_complete:
+            Variables.root.after(0, lambda: on_complete(completados, total))
+
+        if suspend_on_finish and completados > 0:
+            try:
+                if sys.platform == "linux":
+                    subprocess.run(["systemctl", "suspend"], check=False)
+                elif sys.platform == "win32":
+                    subprocess.run(["rundll32.exe", "powrprof.dll,SetSuspendState", "0,1,0"], check=False)
+            except Exception:
+                pass
 
     threading.Thread(target=_worker, daemon=True).start()
 
-# Compatibilidad con código previo
+# Compatibilidad con código legado
 def crear_excel_lista(datos, dummy=None):
     pass
 def crear_excel_video(datos, dummy=None):

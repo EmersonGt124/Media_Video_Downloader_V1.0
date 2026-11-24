@@ -12,12 +12,14 @@ if os.path.exists(lib_bin_path) and lib_bin_path not in sys.path:
 
 try:
     import yt_dlp
+    from yt_dlp.utils import download_range_func
 except ImportError:
     import importlib.util
     spec = importlib.util.spec_from_file_location("yt_dlp", lib_bin_path)
     if spec and spec.loader:
         yt_dlp = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(yt_dlp)
+        from yt_dlp.utils import download_range_func
     else:
         raise RuntimeError("No se pudo cargar la librería yt_dlp.")
 
@@ -26,7 +28,6 @@ def clean_ansi(text: str) -> str:
     """Elimina secuencias de escape ANSI de mensajes de error de yt-dlp."""
     if not text:
         return ""
-    # Quitar códigos ANSI tipo \x1b[0;31m
     cleaned = re.sub(r'\x1b\[[0-9;]*[a-zA-Z]', '', text)
     cleaned = cleaned.replace('\x1b', '').strip()
     return cleaned
@@ -42,6 +43,23 @@ def format_seconds(seconds: Optional[int]) -> str:
     if hours > 0:
         return f"{hours:02d}:{minutes:02d}:{secs:02d}"
     return f"{minutes:02d}:{secs:02d}"
+
+
+def parse_time_str(time_str: str) -> Optional[int]:
+    """Convierte cadenas 'MM:SS', 'HH:MM:SS' o segundos directos a un entero."""
+    if not time_str or not str(time_str).strip():
+        return None
+    parts = str(time_str).strip().split(":")
+    try:
+        if len(parts) == 1:
+            return int(float(parts[0]))
+        elif len(parts) == 2:
+            return int(parts[0]) * 60 + int(parts[1])
+        elif len(parts) == 3:
+            return int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
+    except Exception:
+        return None
+    return None
 
 
 def format_bytes(bytes_val: Optional[float]) -> str:
@@ -64,25 +82,57 @@ class DownloaderEngine:
         return "playlist?list=" in url_lower or "&list=" in url_lower or "/sets/" in url_lower
 
     @staticmethod
-    def extract_info(url: str, is_playlist_hint: Optional[bool] = None) -> Dict[str, Any]:
-        """
-        Extrae información y metadatos de un enlace sin descargarlo.
-        Soporta videos únicos, listas de reproducción y más de 1000 plataformas.
-        """
+    def search_youtube(query: str, max_results: int = 5) -> List[Dict[str, Any]]:
+        """Busca videos en YouTube directamente por palabras clave y devuelve resultados."""
         ydl_opts = {
+            'quiet': True,
+            'skip_download': True,
+            'extract_flat': True,
+            'ignoreerrors': True,
+        }
+        search_query = f"ytsearch{max_results}:{query}"
+        results = []
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            res = ydl.extract_info(search_query, download=False)
+            if res and 'entries' in res:
+                for idx, entry in enumerate(res['entries'], start=1):
+                    if not entry:
+                        continue
+                    v_url = entry.get('url') or entry.get('webpage_url')
+                    if not v_url and entry.get('id'):
+                        v_url = f"https://www.youtube.com/watch?v={entry.get('id')}"
+
+                    dur = entry.get('duration', 0)
+                    results.append({
+                        'index': idx,
+                        'title': entry.get('title', f"Resultado {idx}"),
+                        'duration': dur,
+                        'duration_str': format_seconds(dur),
+                        'url': v_url,
+                        'uploader': entry.get('uploader') or entry.get('channel') or 'Desconocido',
+                        'thumbnail': entry.get('thumbnail') or f"https://i.ytimg.com/vi/{entry.get('id')}/mqdefault.jpg" if entry.get('id') else '',
+                        'views': entry.get('view_count', 0)
+                    })
+        return results
+
+    @staticmethod
+    def extract_info(url: str, cookies_browser: Optional[str] = None) -> Dict[str, Any]:
+        """Extrae información y metadatos de un enlace sin descargarlo."""
+        ydl_opts: Dict[str, Any] = {
             'quiet': True,
             'no_warnings': True,
             'skip_download': True,
             'extract_flat': 'in_playlist',
             'ignoreerrors': True,
         }
+        if cookies_browser and cookies_browser.lower() != "ninguno":
+            ydl_opts['cookiesfrombrowser'] = (cookies_browser.lower(),)
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
             if not info:
                 raise ValueError("No se pudo obtener información del enlace proporcionado.")
 
-            # Comprobar si es lista de reproducción
             if 'entries' in info:
                 entries = []
                 for idx, entry in enumerate(info.get('entries', []), start=1):
@@ -111,7 +161,6 @@ class DownloaderEngine:
                     'url': url
                 }
             else:
-                # Video único
                 duration = info.get('duration', 0)
                 available_resolutions = set()
                 formats = info.get('formats', [])
@@ -158,15 +207,24 @@ class DownloaderEngine:
         embed_metadata: bool,
         embed_thumbnail: bool,
         download_subtitles: bool,
+        time_range: Optional[Tuple[int, int]],
+        rate_limit_bytes: Optional[int],
+        cookies_browser: Optional[str],
         progress_callback: Optional[Callable[[Dict[str, Any]], None]],
         cancel_event: Optional[threading.Event]
-    ) -> Tuple[str, Optional[str]]:
+    ) -> Tuple[str, Optional[str], str]:
         """Función interna que configura y ejecuta yt-dlp."""
         os.makedirs(output_dir, exist_ok=True)
+        final_downloaded_file = ""
 
         def progress_hook(d):
+            nonlocal final_downloaded_file
             if cancel_event and cancel_event.is_set():
                 raise Exception("DESCARGA_CANCELADA_POR_USUARIO")
+
+            fname = d.get('filename')
+            if fname:
+                final_downloaded_file = fname
 
             if not progress_callback:
                 return
@@ -190,7 +248,7 @@ class DownloaderEngine:
                     'total_str': format_bytes(total_bytes) if total_bytes > 0 else "...",
                     'speed_str': f"{format_bytes(speed)}/s" if speed else "Calculando...",
                     'eta_str': format_seconds(eta) if eta else "--:--",
-                    'filename': os.path.basename(d.get('filename', ''))
+                    'filename': os.path.basename(fname or '')
                 }
                 progress_callback(progress_data)
 
@@ -201,7 +259,7 @@ class DownloaderEngine:
                     'percent_str': "100%",
                     'speed_str': "Completado",
                     'eta_str': "Procesando audio/video con FFmpeg...",
-                    'filename': os.path.basename(d.get('filename', ''))
+                    'filename': os.path.basename(fname or '')
                 })
 
         outtmpl = os.path.join(output_dir, '%(title)s [%(id)s].%(ext)s')
@@ -214,6 +272,21 @@ class DownloaderEngine:
             'ignoreerrors': False,
             'nocheckcertificate': True,
         }
+
+        # Límite de velocidad
+        if rate_limit_bytes and rate_limit_bytes > 0:
+            ydl_opts['ratelimit'] = rate_limit_bytes
+
+        # Cookies del navegador
+        if cookies_browser and cookies_browser.lower() != "ninguno":
+            ydl_opts['cookiesfrombrowser'] = (cookies_browser.lower(),)
+
+        # Recorte por tiempo (Trim / Download Sections)
+        if time_range:
+            start_s, end_s = time_range
+            if start_s is not None and end_s is not None and end_s > start_s:
+                ydl_opts['download_ranges'] = download_range_func(None, [(start_s, end_s)])
+                ydl_opts['force_keyframes_at_cuts'] = True
 
         format_clean = format_type.upper().strip()
 
@@ -291,6 +364,17 @@ class DownloaderEngine:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=True)
             title = info.get('title', 'Video') if info else 'Descarga completa'
+
+            # Determinar ruta final del archivo
+            target_ext = format_clean.lower()
+            if not final_downloaded_file and info:
+                final_downloaded_file = ydl.prepare_filename(info)
+            if final_downloaded_file:
+                base_f = os.path.splitext(final_downloaded_file)[0]
+                possible_path = f"{base_f}.{target_ext}"
+                if os.path.exists(possible_path):
+                    final_downloaded_file = possible_path
+
             if progress_callback:
                 progress_callback({
                     'status': 'finished',
@@ -300,7 +384,7 @@ class DownloaderEngine:
                     'eta_str': "¡Listo!",
                     'title': title
                 })
-            return title, None
+            return title, None, final_downloaded_file
 
     @classmethod
     def download(
@@ -312,16 +396,15 @@ class DownloaderEngine:
         embed_metadata: bool = True,
         embed_thumbnail: bool = True,
         download_subtitles: bool = False,
+        time_range: Optional[Tuple[int, int]] = None,
+        rate_limit_bytes: Optional[int] = None,
+        cookies_browser: Optional[str] = None,
         progress_callback: Optional[Callable[[Dict[str, Any]], None]] = None,
         cancel_event: Optional[threading.Event] = None
-    ) -> Tuple[str, Optional[str]]:
+    ) -> Tuple[str, Optional[str], str]:
         """
-        Descarga el medio con tolerancia a fallos:
-        Si fallan los subtítulos (error 429 de YouTube) o la carátula,
-        reintenta automáticamente para que el video/audio NO falle,
-        y devuelve un aviso descriptivo para el usuario.
+        Descarga el medio con tolerancia a fallos, soporte de recorte, límites de velocidad y cookies.
         """
-        # Intento 1: con todas las opciones seleccionadas
         try:
             return cls._execute_ydl(
                 url=url,
@@ -331,6 +414,9 @@ class DownloaderEngine:
                 embed_metadata=embed_metadata,
                 embed_thumbnail=embed_thumbnail,
                 download_subtitles=download_subtitles,
+                time_range=time_range,
+                rate_limit_bytes=rate_limit_bytes,
+                cookies_browser=cookies_browser,
                 progress_callback=progress_callback,
                 cancel_event=cancel_event
             )
@@ -339,11 +425,9 @@ class DownloaderEngine:
             if "DESCARGA_CANCELADA_POR_USUARIO" in err_msg:
                 raise e
 
-            # Si el fallo se debe a subtítulos (como HTTP 429: Too Many Requests)
             if download_subtitles and any(k in err_msg.lower() for k in ["subtitle", "subtítulo", "429"]):
-                # Reintentar automáticamente sin subtítulos
                 try:
-                    title, _ = cls._execute_ydl(
+                    title, _, final_path = cls._execute_ydl(
                         url=url,
                         output_dir=output_dir,
                         format_type=format_type,
@@ -351,6 +435,9 @@ class DownloaderEngine:
                         embed_metadata=embed_metadata,
                         embed_thumbnail=embed_thumbnail,
                         download_subtitles=False,
+                        time_range=time_range,
+                        rate_limit_bytes=rate_limit_bytes,
+                        cookies_browser=cookies_browser,
                         progress_callback=progress_callback,
                         cancel_event=cancel_event
                     )
@@ -361,14 +448,13 @@ class DownloaderEngine:
                         "El video/audio se descargó y procesó con éxito sin subtítulos.\n"
                         "Puedes desmarcar la casilla 'Subtítulos (.srt)' para evitar esta comprobación."
                     )
-                    return title, warning
+                    return title, warning, final_path
                 except Exception as e2:
                     err_msg = clean_ansi(str(e2))
 
-            # Si el fallo se debe a la carátula / thumbnail
             if embed_thumbnail and any(k in err_msg.lower() for k in ["thumbnail", "carátula", "mutagen", "atomicparsley"]):
                 try:
-                    title, _ = cls._execute_ydl(
+                    title, _, final_path = cls._execute_ydl(
                         url=url,
                         output_dir=output_dir,
                         format_type=format_type,
@@ -376,6 +462,9 @@ class DownloaderEngine:
                         embed_metadata=embed_metadata,
                         embed_thumbnail=False,
                         download_subtitles=False,
+                        time_range=time_range,
+                        rate_limit_bytes=rate_limit_bytes,
+                        cookies_browser=cookies_browser,
                         progress_callback=progress_callback,
                         cancel_event=cancel_event
                     )
@@ -383,11 +472,10 @@ class DownloaderEngine:
                         "⚠️ Nota de Carátula:\n"
                         "No fue posible incrustar la carátula en este archivo específico.\n\n"
                         "El video/audio se descargó correctamente sin carátula embebida.\n"
-                        "Puedes desactivar la opción 'Incrustar Carátula / ID3'."
+                        "Puedes desactivar la opción 'Carátula / ID3'."
                     )
-                    return title, warning
+                    return title, warning, final_path
                 except Exception as e3:
                     err_msg = clean_ansi(str(e3))
 
-            # Si no se pudo recuperar, lanzar excepción con mensaje limpio
             raise Exception(err_msg)

@@ -26,25 +26,41 @@ class Database:
                     link TEXT UNIQUE,
                     thumbnail TEXT DEFAULT '',
                     uploader TEXT DEFAULT '',
+                    filepath TEXT DEFAULT '',
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
+            # Intentar agregar columna filepath si no existía previamente
+            try:
+                cursor.execute("ALTER TABLE downloads ADD COLUMN filepath TEXT DEFAULT ''")
+            except Exception:
+                pass
             conn.commit()
 
     @classmethod
-    def add_video(cls, title: str, duration: str, status: str, link: str, thumbnail: str = "", uploader: str = "") -> int:
+    def add_video(
+        cls,
+        title: str,
+        duration: str,
+        status: str,
+        link: str,
+        thumbnail: str = "",
+        uploader: str = "",
+        filepath: str = ""
+    ) -> int:
         cls.init_db()
         with cls.get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                INSERT INTO downloads (title, duration, status, link, thumbnail, uploader)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO downloads (title, duration, status, link, thumbnail, uploader, filepath)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(link) DO UPDATE SET
                     title = excluded.title,
                     duration = excluded.duration,
                     thumbnail = excluded.thumbnail,
-                    uploader = excluded.uploader
-            """, (title, duration, status, link, thumbnail, uploader))
+                    uploader = excluded.uploader,
+                    filepath = CASE WHEN excluded.filepath != '' THEN excluded.filepath ELSE downloads.filepath END
+            """, (title, duration, status, link, thumbnail, uploader, filepath))
             conn.commit()
             return cursor.lastrowid or 0
 
@@ -55,8 +71,8 @@ class Database:
             cursor = conn.cursor()
             for v in videos:
                 cursor.execute("""
-                    INSERT INTO downloads (title, duration, status, link, thumbnail, uploader)
-                    VALUES (?, ?, ?, ?, ?, ?)
+                    INSERT INTO downloads (title, duration, status, link, thumbnail, uploader, filepath)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(link) DO UPDATE SET
                         title = excluded.title,
                         duration = excluded.duration,
@@ -68,7 +84,8 @@ class Database:
                     v.get('status', 'Pendiente'),
                     v.get('url') or v.get('link', ''),
                     v.get('thumbnail', ''),
-                    v.get('uploader', '')
+                    v.get('uploader', ''),
+                    v.get('filepath', '')
                 ))
             conn.commit()
 
@@ -77,16 +94,28 @@ class Database:
         cls.init_db()
         with cls.get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT id, title, duration, status, link, thumbnail, uploader FROM downloads ORDER BY id ASC")
+            cursor.execute("SELECT id, title, duration, status, link, thumbnail, uploader, filepath FROM downloads ORDER BY id ASC")
             rows = cursor.fetchall()
             return [tuple(r) for r in rows]
 
     @classmethod
-    def update_status(cls, link: str, new_status: str):
+    def get_item_by_id(cls, item_id: int) -> Optional[Dict[str, Any]]:
         cls.init_db()
         with cls.get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("UPDATE downloads SET status = ? WHERE link = ?", (new_status, link))
+            cursor.execute("SELECT id, title, duration, status, link, thumbnail, uploader, filepath FROM downloads WHERE id = ?", (item_id,))
+            row = cursor.fetchone()
+            return dict(row) if row else None
+
+    @classmethod
+    def update_status(cls, link: str, new_status: str, filepath: str = ""):
+        cls.init_db()
+        with cls.get_connection() as conn:
+            cursor = conn.cursor()
+            if filepath:
+                cursor.execute("UPDATE downloads SET status = ?, filepath = ? WHERE link = ?", (new_status, filepath, link))
+            else:
+                cursor.execute("UPDATE downloads SET status = ? WHERE link = ?", (new_status, link))
             conn.commit()
 
     @classmethod
@@ -118,9 +147,8 @@ class Database:
         cls.init_db()
         with cls.get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT id, title, duration, status, link, thumbnail, uploader FROM downloads WHERE status = 'Pendiente'")
+            cursor.execute("SELECT id, title, duration, status, link, thumbnail, uploader, filepath FROM downloads WHERE status = 'Pendiente'")
             rows = cursor.fetchall()
             return [dict(r) for r in rows]
 
-# Inicializar al importar
 Database.init_db()

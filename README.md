@@ -1,11 +1,11 @@
-# ⚡ Media Downloader Pro V2.0
+# ⚡ Media Downloader Pro V2.0 (S-Tier Edition)
 
 <p align="center">
   <img src="PROYECTO/lib/data/icon.png" width="100" alt="Media Downloader Pro Logo" />
 </p>
 
 <p align="center">
-  <strong>Aplicación de escritorio moderna, rápida y multiplataforma para descargar videos y audios de YouTube, Playlists, TikTok, Instagram, Twitter/X y +1000 sitios.</strong>
+  <strong>Suite multimedia de escritorio definitiva para descargar, convertir, recortar y gestionar videos y pistas de audio de YouTube, Playlists, TikTok, Instagram, Twitter/X y +1000 sitios.</strong>
 </p>
 
 <p align="center">
@@ -22,42 +22,48 @@
 
 ## 📸 Capturas de Pantalla
 
-### 🌙 Modo Oscuro (Dark Theme) — Previsualización y Descarga en Vivo
+### 🌙 Modo Oscuro (Dark Theme) — Controles Avanzados, Recorte y Descargas en Vivo
 ![Media Downloader Pro - Modo Oscuro](assets/preview_dark.png)
 
-### ☀️ Modo Claro (Light Theme) — Alternador de Tema en Caliente
+### ☀️ Modo Claro (Light Theme) — Diseño Fluent y Alternador de Tema en Caliente
 ![Media Downloader Pro - Modo Claro](assets/preview_light.png)
 
 ---
 
-## ✨ Características Principales
+## 💎 Características de Nivel Élite (S-Tier)
 
-### 🎬 Video de Máxima Calidad
-- **Hasta 4K / 8K y 60 FPS:** Descarga videos individuales, Shorts y listas completas en resoluciones 4320p, 2160p (4K), 1440p (2K), 1080p, 720p, 480p y 360p.
-- **Ensamblado Inteligente (Muxing):** Combina automáticamente los mejores flujos de video y audio independientes con **FFmpeg** sin pérdida de fidelidad.
+### 🎬 Descarga en Máxima Resolución y Conversión Real
+- **Hasta 4K / 8K y 60 FPS:** Descarga videos individuales, Shorts y playlists completas en resoluciones 4320p, 2160p (4K), 1440p (2K), 1080p, 720p, 480p y 360p.
+- **Ensamblado Inteligente (Muxing):** Combina automáticamente los mejores flujos de video y audio independientes con **FFmpeg** sin pérdida de calidad.
+- **Audio de Alta Fidelidad:** Conversión real a **MP3 (hasta 320 kbps)**, M4A, WAV y FLAC.
+- **Etiquetado ID3 y Carátulas Embebidas:** Inserta título, artista/canal, año y portada original dentro del archivo.
 
-### 🎵 Extracción de Audio Real y Metadatos ID3
-- **Formatos Profesionales:** Conversión real a **MP3 (hasta 320 kbps)**, M4A, WAV y FLAC (se eliminó la práctica de renombrar extensiones).
-- **Etiquetado ID3 Completo:** Guarda metadatos de título, artista/canal, año y álbum directamente en el archivo de audio.
-- **Incrustación de Carátula:** Inserta la portada original del video en alta resolución dentro de los archivos MP3 y MP4.
+### ✂️ Recorte de Fragmentos de Tiempo (*Trim / Sections*)
+- **Descarga solo lo que necesitas:** Define un rango de tiempo específico (*Ej: De `00:30` a `02:15`*) y el motor descargará únicamente ese fragmento con precisión de fotogramas sin necesidad de descargar el video entero.
+
+### 🔍 Buscador de YouTube Integrado (In-App Search)
+- **Búsqueda directa sin navegador:** Escribe un término de búsqueda (ej. *"música relajante para programar"*) o pulsa el botón **🔎 Buscador** para explorar los mejores resultados de YouTube con duración y canal, y cargarlos o descargarlos con un solo clic.
+
+### ⚡ Descargas Simultáneas en Paralelo (Multi-Worker Pool)
+- **Aprovecha tu conexión al 100%:** Configura la cola para descargar **1, 2, 3 o 4 videos al mismo tiempo** en paralelo utilizando un pool de hilos optimizado.
+
+### 🚦 Limitador de Ancho de Banda y Velocidad
+- **Control de tráfico de red:** Evita saturar tu conexión limitando la velocidad de descarga a **10 MB/s, 5 MB/s, 2 MB/s o 1 MB/s** con un solo clic.
+
+### 🍪 Soporte de Cookies del Navegador (*Bypass de +18 y Privados*)
+- **Contenido restringido:** Selecciona tu navegador (**Firefox, Chrome, Brave, Edge o Chromium**) para importar cookies de sesión y descargar videos con restricción de edad (+18) o listas de reproducción privadas.
+
+### ▶️ Reproductor Rápido Integrado
+- **Escucha o mira al instante:** Botón **"▶ Reproducir Sel."** y soporte para **doble clic** en la lista de descargas para reproducir de inmediato cualquier archivo completado con tu reproductor favorito del sistema.
+
+### 🔔 Notificaciones Nativas y Automatizaciones
+- **Avisos de Escritorio:** Notificaciones nativas con sonido en el escritorio del sistema operativo al finalizar descargas individuales o colas masivas.
+- **Acciones Post-Descarga:**
+  - *Abrir archivo al terminar.*
+  - *Suspender o apagar el equipo al finalizar toda la cola* (ideal para descargas nocturnas).
 
 ### 🛡️ Tolerancia a Fallos Inteligente (Auto-Recuperación)
 - **Superación de Error 429 de YouTube:** Si los subtítulos automáticos son limitados por la API de YouTube (`HTTP Error 429: Too Many Requests`), el motor **no aborta la descarga**; recupera el flujo de video/audio completo y notifica de manera amigable al usuario.
-- **Protección de Carátula:** Si un archivo multimedia exótico rechaza la carátula embebida, la descarga continúa sin errores y se genera el archivo funcionalmente intacto.
-
-### ⚡ Arquitectura Asíncrona (Cero Congelamientos)
-- **Multihilo (`threading`):** El análisis de enlaces, descarga de miniaturas y transferencias de archivos se ejecutan en hilos secundarios dedicados. La interfaz responde fluidamente en todo momento.
-- **Progreso y Métricas en Tiempo Real:** Barra de progreso porcentual, medidor de velocidad en tiempo real (`MB/s`), tiempo estimado restante (`ETA`) y bytes transferidos.
-- **Botón de Cancelación Inmediata:** Detén cualquier descarga en ejecución de manera segura y limpia con un solo clic.
-
-### 📋 Cola de Descargas y Playlists con SQLite
-- **Persistencia Rápida y Segura:** Base de datos local SQLite (`lib/data/downloads.db`) en reemplazo de pesados archivos de cálculo.
-- **Gestión por Lotes:** Descarga videos individuales o vacía la cola completa de forma desatendida.
-
-### 🖥️ Interfaz Moderna y Responsiva
-- **Tema Sun Valley (`sv_ttk`):** Estilo Fluent / Windows 11 moderno con esquinas suaves y paleta Dark/Light intercambiable.
-- **Auto-detección de Portapapeles:** Detecta automáticamente enlaces multimedia copiados desde el navegador para pegarlos y analizarlos al instante.
-- **Diseño Adaptable:** Los controles se reorganizan dinámicamente según el tamaño de la ventana, sin cortar botones ni requerir resoluciones gigantescas.
 
 ---
 
@@ -67,12 +73,12 @@
 - **FFmpeg:** Instalado y disponible en el PATH del sistema.
   - **Linux (Arch/Garuda):** `sudo pacman -S ffmpeg`
   - **Linux (Ubuntu/Debian):** `sudo apt install ffmpeg`
-  - **Windows:** Descargar de [gyan.dev](https://www.gyan.dev/ffmpeg/builds/) y agregar al PATH o instalar vía `winget install Gyan.FFmpeg`.
+  - **Windows:** Descargar de [gyan.dev](https://www.gyan.dev/ffmpeg/builds/) o instalar vía `winget install Gyan.FFmpeg`.
   - **macOS:** `brew install ffmpeg`
 
 ---
 
-## 🚀 Instalación y Uso
+## 🚀 Instalación y Uso Rápido
 
 1. **Clonar el repositorio:**
    ```bash
@@ -103,12 +109,12 @@ Media_Video_Downloader_V1.0/
 │   └── preview_light.png
 ├── PROYECTO/                   # Código fuente de la aplicación
 │   ├── Media_Downloader.py     # Punto de entrada principal
-│   ├── Downloader_Engine.py    # Motor yt-dlp + FFmpeg con auto-fallback
-│   ├── Database.py             # Capa de persistencia con SQLite
-│   ├── Youtube_Funciones.py    # Vista principal y controles de usuario
-│   ├── Home_Funciones.py       # Ventana principal, barra superior y temas
-│   ├── Botones_Funciones.py    # Controladores de hilos, Treeview y descargas
-│   ├── Alertas.py              # Diálogos y alertas multiplataforma
+│   ├── Downloader_Engine.py    # Motor yt-dlp + FFmpeg con recorte, velocidad, cookies y buscador
+│   ├── Database.py             # Capa de persistencia con SQLite y tracking de rutas
+│   ├── Youtube_Funciones.py    # Vista principal, buscador modal y herramientas élite
+│   ├── Home_Funciones.py       # Ventana principal, barra superior y gestión de temas
+│   ├── Botones_Funciones.py    # Controladores multihilo, descargas paralelas y notificaciones
+│   ├── Alertas.py              # Diálogos y alertas multiplataforma limpias
 │   ├── Screen_Holding.py       # Splash screen nativo
 │   ├── Variables.py            # Rutas, colores y estados globales
 │   ├── NOTAS                   # Bitácora interna de desarrollo
@@ -123,8 +129,8 @@ Media_Video_Downloader_V1.0/
 
 ## 🤝 Plataformas Compatibles
 
-Gracias a la integración con `yt-dlp`, Media Downloader Pro es capaz de procesar enlaces de:
-- **YouTube** (Videos regulares, Shorts, Playlists, Canales, Transmisiones finalizadas).
+Gracias al motor avanzado `yt-dlp`, Media Downloader Pro es capaz de procesar enlaces de:
+- **YouTube** (Videos 4K/8K, Shorts, Playlists, Canales, Transmisiones finalizadas).
 - **TikTok** (Sin marcas de agua cuando la plataforma lo permite).
 - **Instagram** (Reels, Posts y Videos).
 - **Twitter / X** (Clips y publicaciones de video).
