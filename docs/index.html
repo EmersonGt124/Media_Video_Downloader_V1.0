@@ -741,9 +741,9 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
           <span>GitHub</span>
         </a>
-        <a href="#install" class="btn btn-primary">
+        <a id="nav-download-btn" href="#install" class="btn btn-primary">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-          <span>Descargar Gratis</span>
+          <span id="nav-download-txt">Descargar Gratis</span>
         </a>
       </div>
     </div>
@@ -768,10 +768,10 @@
         La suite de escritorio definitiva para <strong>YouTube, TikTok, Instagram, Twitter/X, SoundCloud</strong> y +1000 sitios. Con recorte de fragmentos, descargas paralelas, buscador integrado y conversión real a MP3 a 320 kbps.
       </p>
 
-      <div class="hero-cta">
-        <a href="#install" class="btn btn-primary" style="padding: 14px 28px; font-size: 1.05rem;">
+      <div class="hero-cta" style="flex-wrap: wrap; justify-content: center; gap: 14px;">
+        <a id="hero-download-btn" href="#install" class="btn btn-primary" style="padding: 14px 28px; font-size: 1.05rem;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-          <span>Descargar App Completa</span>
+          <span id="hero-download-txt">Descargar App Completa</span>
         </a>
 
         <a href="#webapp" class="btn btn-glow" style="padding: 14px 28px; font-size: 1.05rem;">
@@ -783,6 +783,9 @@
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
           <span>GitHub</span>
         </a>
+      </div>
+      <div style="margin-top: 12px;">
+        <a href="#install" style="font-size: 0.85rem; color: #94a3b8; text-decoration: underline; opacity: 0.85;">¿Usas otro sistema? Ver opciones para Windows, Linux y Mac</a>
       </div>
 
       <!-- APP MOCKUP -->
@@ -1499,6 +1502,38 @@
         errorBox.style.display = 'block';
       }
     }
+
+    // Detección automática del sistema operativo para descarga directa en 1 clic
+    (function detectarSistemaYConfigurarDescarga() {
+      const ua = navigator.userAgent || '';
+      let os = 'Windows';
+      let extension = '.zip';
+      let dlUrl = 'https://github.com/EmersonGt124/Media_Video_Downloader_V1.0/releases/download/v2.0.0/MediaDownloaderPro-Windows-x64.zip';
+
+      if (/Macintosh|Mac OS X/i.test(ua)) {
+        os = 'macOS';
+        extension = '.zip';
+        dlUrl = 'https://github.com/EmersonGt124/Media_Video_Downloader_V1.0/releases/download/v2.0.0/MediaDownloaderPro-macOS-x64.zip';
+      } else if (/Linux/i.test(ua) && !/Android/i.test(ua)) {
+        os = 'Linux';
+        extension = '.tar.gz';
+        dlUrl = 'https://github.com/EmersonGt124/Media_Video_Downloader_V1.0/releases/download/v2.0.0/MediaDownloaderPro-Linux-x64.tar.gz';
+      }
+
+      const heroBtn = document.getElementById('hero-download-btn');
+      const heroTxt = document.getElementById('hero-download-txt');
+      const navBtn = document.getElementById('nav-download-btn');
+      const navTxt = document.getElementById('nav-download-txt');
+
+      if (heroBtn && heroTxt) {
+        heroBtn.href = dlUrl;
+        heroTxt.textContent = `Descargar para ${os} (${extension})`;
+      }
+      if (navBtn && navTxt) {
+        navBtn.href = dlUrl;
+        navTxt.textContent = `Descargar (${os})`;
+      }
+    })();
   </script>
 </body>
 </html>
