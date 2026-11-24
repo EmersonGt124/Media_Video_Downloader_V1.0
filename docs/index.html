@@ -79,10 +79,12 @@
     .brand {
       display: flex;
       align-items: center;
-      gap: 12px;
-      font-size: 1.25rem;
+      gap: 10px;
+      font-size: 1.2rem;
       font-weight: 800;
       letter-spacing: -0.025em;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .brand img {
@@ -104,10 +106,11 @@
 
     .nav-links {
       display: flex;
-      gap: 24px;
+      gap: 22px;
       font-size: 0.92rem;
       font-weight: 500;
       color: var(--text-muted);
+      white-space: nowrap;
     }
 
     .nav-links a:hover {
@@ -116,8 +119,9 @@
 
     .nav-actions {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       align-items: center;
+      flex-shrink: 0;
     }
 
     /* BOTONES */
@@ -126,13 +130,16 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      padding: 10px 20px;
-      font-size: 0.95rem;
+      padding: 9px 18px;
+      font-size: 0.9rem;
       font-weight: 600;
       border-radius: 12px;
       cursor: pointer;
       transition: all 0.2s ease;
       border: none;
+      white-space: nowrap;
+      line-height: 1.2;
+    }
     }
 
     .btn-primary {
@@ -682,10 +689,12 @@
     }
 
     /* RESPONSIVE */
-    @media (max-width: 768px) {
+    @media (max-width: 1040px) {
       .nav-links {
         display: none;
       }
+    }
+    @media (max-width: 768px) {
       .grid-3 {
         grid-template-columns: 1fr;
       }
@@ -714,7 +723,6 @@
       </a>
 
       <div class="nav-links">
-        <a href="#webapp" style="color: #38bdf8; font-weight: 700;">🌐 Probar Online</a>
         <a href="#features">Características</a>
         <a href="#preview">Capturas</a>
         <a href="#comparativa">Comparativa</a>
