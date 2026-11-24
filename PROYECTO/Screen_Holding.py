@@ -1,58 +1,67 @@
 import tkinter as tk
 from PIL import Image, ImageDraw, ImageFont, ImageTk
-from tkinter import font
-from datetime import datetime
 import getpass
 import socket
-import time #modulo para funciones de tiemp
-import random #modulo para general randoms
+import os
 
-#Variables datos de usuario del equipo
 Host_nombre = socket.gethostname()
 nombre_usuario = getpass.getuser()
 host_y_usuario = f"{Host_nombre} / {nombre_usuario}"
 
-def generar_numero_aleatorio(n1, n2):
-    return random.randint(n1, n2)
+def mostrar_imagen_con_texto(duration_ms=1200):
+    """Muestra una pantalla de carga elegante y se cierra automáticamente."""
+    try:
+        root = tk.Tk()
+        root.overrideredirect(True)
 
-def mostrar_imagen_con_texto():
-    tiempo_espera = generar_numero_aleatorio(3000, 8000)
-    root = tk.Tk()
-    root.overrideredirect(True)  # Oculta la barra de título y bordes de la ventana
+        screen_width = root.winfo_screenwidth()
+        screen_height = root.winfo_screenheight()
 
-    # Obtener el ancho y alto de la pantalla
-    screen_width = root.winfo_screenwidth()
-    screen_height = root.winfo_screenheight()
+        width = 320
+        height = 320
+        x = (screen_width - width) // 2
+        y = (screen_height - height) // 2
+        root.geometry(f"{width}x{height}+{x}+{y}")
+        root.configure(bg="#0f172a")
 
-    # Calcular la posición de la imagen para que aparezca en el centro
-    x = (screen_width - 300) // 2  # Ajusta 300 al ancho deseado de la imagen
-    y = (screen_height - 300) // 2  # Ajusta 300 al alto deseado de la imagen
-    root.geometry("+{}+{}".format(x, y))  # Posición de la ventana
+        # Cargar y procesar imagen si existe
+        img_path = os.path.join(os.path.dirname(__file__), 'lib', 'data', 'loading.png')
+        if os.path.exists(img_path):
+            img = Image.open(img_path).convert("RGBA")
+            img = img.resize((width, height), Image.Resampling.LANCZOS)
+            draw = ImageDraw.Draw(img)
 
-    # Cargar la imagen y cambiar su tamaño
-    imagen = Image.open('lib/data/loading.png') #la ruta desde lib porque el ejecutable se llamara desde afuera y necesita cojer la ruta completa
-    imagen = imagen.resize((300, 300))
-    draw = ImageDraw.Draw(imagen)
-    # Agregar texto a la imagen
-    texto = "Media Downloader_V1.0"
-    font = ImageFont.truetype("lib/data/fuente/poppins.ttf", 20)
-    draw.text((30, 180), texto, fill="black", font=font)
+            # Texto estilizado
+            font_path = os.path.join(os.path.dirname(__file__), 'lib', 'data', 'fuente', 'poppins.ttf')
+            font_title = None
+            font_sub = None
+            if os.path.exists(font_path):
+                try:
+                    font_title = ImageFont.truetype(font_path, 18)
+                    font_sub = ImageFont.truetype(font_path, 11)
+                except Exception:
+                    pass
 
-    texto = "Cargando..."
-    font = ImageFont.truetype("lib/data/fuente/poppins.ttf", 20)
-    draw.text((100, 210), texto, fill="black", font=font)
+            draw.text((35, 180), "Media Downloader Pro", fill="#ffffff", font=font_title)
+            draw.text((105, 215), "Iniciando...", fill="#38bdf8", font=font_sub)
+            draw.text((70, 275), host_y_usuario, fill="#94a3b8", font=font_sub)
 
-    texto = host_y_usuario
-    font = ImageFont.truetype("lib/data/fuente/poppins.ttf", 10)
-    draw.text((75, 270), texto, fill="black", font=font)
+            tk_img = ImageTk.PhotoImage(img)
+            label = tk.Label(root, image=tk_img, bg="#0f172a", bd=0)
+            label.image = tk_img
+            label.pack(expand=True, fill="both")
+        else:
+            # Fallback simple sin imagen
+            lbl_title = tk.Label(root, text="Media Downloader Pro", font=("Helvetica", 16, "bold"), fg="#ffffff", bg="#0f172a")
+            lbl_title.pack(pady=(100, 10))
+            lbl_sub = tk.Label(root, text="Iniciando...", font=("Helvetica", 11), fg="#38bdf8", bg="#0f172a")
+            lbl_sub.pack()
 
-    # Crear una referencia global a img en la ventana principal
-    root.img = ImageTk.PhotoImage(imagen)
+        # Cerrar automáticamente tras duration_ms
+        root.after(duration_ms, root.destroy)
+        root.mainloop()
+    except Exception as e:
+        print(f"Nota en splash screen: {e}")
 
-    panel = tk.Label(root, image=root.img)
-    panel.pack()
-
-    root.after(tiempo_espera, root.destroy)
-    root.mainloop()
-
-mostrar_imagen_con_texto()
+if __name__ == "__main__":
+    mostrar_imagen_con_texto()

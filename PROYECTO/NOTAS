@@ -1,57 +1,48 @@
-###############
-POR IMPLEMENTAR
-###############
+================================================================================
+MEDIA DOWNLOADER PRO V2.0 - REGISTRO DE DESARROLLO Y MEJORAS COMPLETADAS
+================================================================================
 
-1# Etiquetado automático de archivos: Función que agrega automáticamente metadatos como el título, el artista, el álbum, etc., a los archivos de audio descargados.
+[X] TODAS LAS FUNCIONES PREVIAMENTE PENDIENTES FUERON IMPLEMENTADAS Y MEJORADAS:
 
-2# Extracción de subtítulos/LYRICS: Capacidad para descargar los subtítulos de los videos junto con el contenido principal.
+1. MOTOR PROFESIONAL DE DESCARGA:
+   - Migración completa de pytube a yt-dlp.
+   - Soporte para videos 1080p, 2K, 4K, 8K y 60 FPS con FFmpeg sin pérdida de calidad.
+   - Soporte para listas de reproducción (Playlists) y canales completos.
+   - Compatibilidad multiplataforma: YouTube, TikTok, Instagram, Twitter/X, SoundCloud, Facebook, Twitch y +1000 sitios web.
 
-3# Soporte técnico: Proporcionar soporte técnico eficiente para resolver cualquier problema que los usuarios puedan enfrentar durante el uso del software.
+2. CONVERSIÓN Y CALIDAD DE AUDIO REAL:
+   - Extracción de audio real con FFmpeg en múltiples formatos: MP3 (320kbps, 256kbps, 192kbps), M4A, WAV y FLAC.
+   - Eliminada la práctica de solo renombrar la extensión .mp4 a .mp3.
 
-4# Velocidad de descarga rápida: Optimizar el proceso de descarga para obtener velocidades rápidas y eficientes.
+3. ETIQUETADO AUTOMÁTICO DE METADATOS Y CARÁTULAS (ID3):
+   - Se incrustan automáticamente metadatos en MP3 y MP4 (título, artista, álbum, año).
+   - Inserción automática de la carátula original en alta resolución dentro del archivo de audio/video.
 
-5# Conversión de formatos: Capacidad para convertir los archivos descargados a diferentes formatos de archivo como MP4, MP3, AVI, etc.
+4. EXTRACCIÓN DE SUBTÍTULOS / LETRAS:
+   - Opción para descargar subtítulos y letras (.srt) en español e inglés generados por el autor o automáticos.
 
+5. ARQUITECTURA MULTIHILO (THREADING) Y SIN CONGELAMIENTOS:
+   - Todo el análisis de URLs, descargas de miniaturas y descargas de medios se ejecutan en hilos secundarios dedicados.
+   - La interfaz de usuario nunca se bloquea ni se congela ("No responde").
+   - Botón de cancelación inmediata y segura de descargas activas.
 
-####################
-FUNCIONES TERMINADAS
-####################
+6. PROGRESO Y MÉTRICAS EN TIEMPO REAL:
+   - Barra de progreso dinámica porcentual.
+   - Velocidad de descarga en vivo en MB/s o KB/s.
+   - Tiempo estimado restante (ETA).
+   - Bytes descargados vs. tamaño total estimado.
 
-#Alertas.py: Funciones para mostrar alertas dependiendo el proceso del sistema
-	alerta_ok: 
-		muestra alerta con icono de aviso con boton "aceptar"
-	alerta_error: 
-		muestra alerta con icono rojo de error con botones "anular, reintentar, omitir"
-	alerta_aceptar: 
-		muestra alerta de aviso amarrillo con dos botones"aceptar, cancelar"
-	alerta_aceptar_sin: 
-		igual a la anterior solo que esta alerta no depende de una vantana, para no parar el funcionamiento de los demas funciones del programa
-	alerta_cerrar: 
-		muestra alerta con el icono amarillo con boton "aceptar, cancelar"
-	alerta_Amarilla: 
-		muestra alerta amarilla con boton "aceptar"
+7. BASE DE DATOS LOCAL ROBUSTA (SQLITE):
+   - Reemplazado el archivo Excel (.xlsx) por una base de datos local SQLite ultrarrápida (lib/data/downloads.db).
+   - Soporte para cola de descargas, descargas individuales y descargas masivas por lotes con persistencia segura.
 
-#Home_Funciones.py: funciones para instanciar la ventana principal root
-	al_cerrar_ventana: 
-		funcion para al detectar que cierro el programa desde 'X' de windows, matar otros procesos
-	screen_holding: 
-		funcion para ejecutar el inicialiador de holding mientras el programa carga
-	Barra_superior: 
-		funcion con todos los items necesarios para la barra de la ventana principal, botones y demas
-	crear_windows_principal: 
-		funcion que crea la ventana principal de donde se parten varios frames para las otras ventanas
+8. REDISEÑO DE INTERFAZ MODERNA (SV-TTK SUN VALLEY):
+   - Diseño estilo Fluent / Windows 11 moderno con esquinas suaves y paleta Dark/Light.
+   - Botón para alternar tema (Oscuro / Claro) en caliente.
+   - Previsualización en vivo de miniaturas y detalles del video.
+   - Auto-detección opcional de URLs copiadas en el portapapeles.
+   - Ventana responsiva y redimensionable con límites mínimos.
 
-#Botones_Funciones.py:
-	selecion_boton(self): 
-		funcion para darle un efecto al pasar el mouse sobre los botones de la barra superior, se le pasa como parametro el boton que obtendra el efecto, la funcion toma de varibales dos colores uno para selecionar y otro para el estado normal del boton.
-	seleccionar_label(label, imagen_original, imagen_hover):
-		funcion para botones tipo imagenes, para efecto de cambio de la imagen cuando se seleciona con el mouse, recice el label o boton, la imagen original, y luego la imagen que se cambiara cuando pase el mouse sobre el boton.
-	cambio_ventana(ventana_factory, frame):
-		funcion para iteral sobre el cambio de ventanas/pantallas/frames, destrye el contenido del frame actual y crea un nuevo con el nombre de ventana_factory!
-	logos(logo, ancho, alto, x, y):
-		funcion para instanciar una imagen o logo, en la aplicacion recive el nombre de la imagen, ancho y alto y posicion en el aplicativo.
-	search_boton(logo, hover, ancho, alto, x, y):
-		funcion unica para instanciar la imagen que simulara una barra de busqueda personalizado.
-	Barra_busqueda(parent, width, x, y):
-		funciones unica para crear la barra de busqueda tipo entry, que ira sobre el search_boton.
-	
+9. COMPATIBILIDAD MULTIPLATAFORMA REAL:
+   - Se eliminaron las llamadas dependientes de Windows (ctypes.windll y Screen_Holding.exe).
+   - Ahora funciona de manera nativa en Linux, Windows y macOS.

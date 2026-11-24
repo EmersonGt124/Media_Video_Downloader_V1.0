@@ -1,63 +1,74 @@
-import tkinter as tk 
-from tkinter import font
+import os
 import getpass
+from pathlib import Path
 
-##########################
-        #VENTANA
-##########################
-#Variables inicializador de ventana
-root = tk.Tk() #inicializar tk ventana root
+# INFORMACIÓN DE LA APLICACIÓN
+titulo = "Media Downloader Pro V2.0"
+version = "2.0.0"
+Usuario = getpass.getuser()
 
-titulo = "Media Downloader V1.0"
-icono_v = "lib/data/icon.ico"
+# RUTAS BASE
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(BASE_DIR, "lib", "data")
+FONT_DIR = os.path.join(DATA_DIR, "fuente")
 
-#VIDEOS INFORMACION
+# RECURSOS GRÁFICOS
+icono_v = os.path.join(DATA_DIR, "icon.png") if os.path.exists(os.path.join(DATA_DIR, "icon.png")) else os.path.join(DATA_DIR, "icon.ico")
+Youtube_logo = os.path.join(DATA_DIR, "Youtube_logo.png")
+Youtube_logo1 = os.path.join(DATA_DIR, "Youtube_logo1.png")
+Campo_busqueda = os.path.join(DATA_DIR, "bar_search.png")
+lupa = os.path.join(DATA_DIR, "search.png")
+lupa1 = os.path.join(DATA_DIR, "search1.png")
+D_seleccion = os.path.join(DATA_DIR, "D_selecion.png")
+D_seleccion1 = os.path.join(DATA_DIR, "D_selecion1.png")
+D_todo = os.path.join(DATA_DIR, "D_Todo.png")
+D_todo1 = os.path.join(DATA_DIR, "D_Todo1.png")
+recicle = os.path.join(DATA_DIR, "recile.png")
+recicle1 = os.path.join(DATA_DIR, "recile1.png")
+
+# RUTA POR DEFECTO PARA DESCARGAS
+user_home = str(Path.home())
+descargas_posibles = [
+    os.path.join(user_home, "Descargas"),
+    os.path.join(user_home, "Downloads"),
+    user_home
+]
+carpeta_descargas_default = next((p for p in descargas_posibles if os.path.exists(p)), user_home)
+
+# BASE DE DATOS Y COMPATIBILIDAD
+data_db = os.path.join(DATA_DIR, "downloads.db")
+data_excel = os.path.join(DATA_DIR, "y_data.xlsx")
+yotube_link = "https://www.youtube.com"
+
+# ESTADOS
 Pendiente = "Pendiente"
+Descargando = "Descargando"
 Terminado = "Terminado"
-cantidad = 0
+Error = "Error"
+Cancelado = "Cancelado"
 
+# PALETA DE COLORES MODERNA (Dark & Accent)
+BG_DARK = "#0f172a"        # Slate 900
+BG_CARD = "#1e293b"        # Slate 800
+BG_HOVER = "#334155"       # Slate 700
+ACCENT_COLOR = "#0ea5e9"   # Sky 500
+ACCENT_HOVER = "#0284c7"   # Sky 600
+RED_ACCENT = "#ef4444"     # Red 500
+GREEN_ACCENT = "#10b981"   # Emerald 500
+TEXT_PRIMARY = "#f8fafc"   # Slate 50
+TEXT_SECONDARY = "#94a3b8" # Slate 400
+
+# Colores legacy para retrocompatibilidad
+Y_boton = '#F53939'
+Y_backgroun = '#0f172a'
+c_barras = '#1e293b'
+c_selecion = '#334155'
+poppins = "Helvetica"
+poppins_negrita = "Helvetica"
+
+# Variables globales de ejecución (se asignan al arrancar)
+root = None
 entry_lik = ""
 enlace = ""
 fila = 0
-
-##########################
-        #DATA
-##########################
-Usuario = getpass.getuser()
-
-##########################
-      #VENTANA FUENTES
-##########################
-ruta_fuente = "lib/data/fuente/poppins.ttf"
-poppins_negrita = font.Font(family="Popins", weight="bold")
-poppins = font.Font(family="Popins")
-
-##########################
-      #DOCUMENTOS
-##########################
-Youtube_logo = "lib/data/Youtube_logo.png"
-Youtube_logo1 = "lib/data/Youtube_logo1.png"
-Campo_busqueda = "lib/data/bar_search.png"
-lupa = "lib/data/search.png"
-lupa1 = "lib/data/search1.png"
-D_seleccion = "lib/data/D_selecion.png"
-D_seleccion1 = "lib/data/D_selecion1.png"
-D_todo = "lib/data/D_Todo.png"
-D_todo1 = "lib/data/D_Todo1.png"
-recicle = "lib/data/recile.png"
-recicle1 = "lib/data/recile1.png"
-
-data_excel = "lib/data/y_data.xlsx"
-yotube_link = "https://www.youtube.com"
-
-##########################
-      #VENTANA COLORES
-##########################
-#Youtube paleta 
-Y_boton = '#F53939'
-Y_backgroun = '#080B1E'
-
-#barra superior
-c_barras = "#FFFFFF"
-c_selecion = "#C7C7C9"
-
+cantidad = 0
