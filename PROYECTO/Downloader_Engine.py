@@ -77,6 +77,30 @@ class DownloaderEngine:
     """Motor moderno de descarga y análisis de medios con yt-dlp y FFmpeg."""
 
     @staticmethod
+    def get_ffmpeg_location() -> Optional[str]:
+        """Detecta la ubicación de FFmpeg si está empaquetado con la app o en lib/ffmpeg."""
+        if getattr(sys, 'frozen', False):
+            base_candidates = [
+                getattr(sys, '_MEIPASS', ''),
+                os.path.dirname(sys.executable),
+                os.path.join(os.path.dirname(sys.executable), 'ffmpeg'),
+            ]
+            for base in base_candidates:
+                if not base:
+                    continue
+                for fname in ['ffmpeg.exe', 'ffmpeg']:
+                    if os.path.isfile(os.path.join(base, fname)):
+                        return base
+
+        local_ffmpeg = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib', 'ffmpeg')
+        if os.path.isdir(local_ffmpeg):
+            for fname in ['ffmpeg.exe', 'ffmpeg']:
+                if os.path.isfile(os.path.join(local_ffmpeg, fname)):
+                    return local_ffmpeg
+
+        return None
+
+    @staticmethod
     def is_playlist(url: str) -> bool:
         url_lower = url.lower()
         return "playlist?list=" in url_lower or "&list=" in url_lower or "/sets/" in url_lower
@@ -272,6 +296,11 @@ class DownloaderEngine:
             'ignoreerrors': False,
             'nocheckcertificate': True,
         }
+
+        # Ubicación personalizada o empaquetada de FFmpeg
+        ffmpeg_loc = DownloaderEngine.get_ffmpeg_location()
+        if ffmpeg_loc:
+            ydl_opts['ffmpeg_location'] = ffmpeg_loc
 
         # Límite de velocidad
         if rate_limit_bytes and rate_limit_bytes > 0:

@@ -100,6 +100,39 @@
 
 ---
 
+## 🚀 Descarga Directa (Binarios Portables - Cero Comandos)
+
+Si solo deseas utilizar la aplicación sin necesidad de instalar Python ni abrir una terminal:
+
+👉 **[Descargar la última versión en GitHub Releases](https://github.com/EmersonGt124/Media_Video_Downloader_V1.0/releases/latest)**
+
+| Sistema Operativo | Paquete Descargable | Cómo Usarlo |
+| :--- | :--- | :--- |
+| 🪟 **Windows 10 / 11** | `MediaDownloaderPro-Windows-x64.zip` | Descomprimir y hacer doble clic en `MediaDownloaderPro.exe` *(incluye FFmpeg integrado)*. |
+| 🐧 **Linux (Ubuntu, Arch, Fedora)** | `MediaDownloaderPro-Linux-x64.tar.gz` | Descomprimir y ejecutar `./MediaDownloaderPro`. |
+| 🍎 **macOS (Intel / Apple Silicon)** | `MediaDownloaderPro-macOS-x64.zip` | Descomprimir y hacer doble clic para abrir la app. |
+
+---
+
+## 💻 Ejecución desde el Código Fuente (Desarrolladores)
+
+Si deseas clonar y ejecutar el proyecto con Python:
+
+```bash
+# 1. Clona el repositorio
+git clone https://github.com/EmersonGt124/Media_Video_Downloader_V1.0.git
+cd Media_Video_Downloader_V1.0
+
+# 2. Instala las dependencias
+pip install -r requirements.txt
+
+# 3. Inicia la aplicación
+cd PROYECTO
+python3 Media_Downloader.py
+```
+
+---
+
 ## 📂 Estructura del Proyecto
 
 ```text

@@ -1,5 +1,6 @@
 import os
 import getpass
+import sys
 from pathlib import Path
 
 # INFORMACIÓN DE LA APLICACIÓN
@@ -7,8 +8,12 @@ titulo = "Media Downloader Pro V2.0"
 version = "2.0.0"
 Usuario = getpass.getuser()
 
-# RUTAS BASE
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# RUTAS BASE (Compatibilidad completa con PyInstaller frozen y modo desarrollo)
+if getattr(sys, 'frozen', False):
+    BASE_DIR = getattr(sys, '_MEIPASS', os.path.dirname(sys.executable))
+else:
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 DATA_DIR = os.path.join(BASE_DIR, "lib", "data")
 FONT_DIR = os.path.join(DATA_DIR, "fuente")
 

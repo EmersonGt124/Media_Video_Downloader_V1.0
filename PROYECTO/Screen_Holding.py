@@ -3,6 +3,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageTk
 import getpass
 import socket
 import os
+import Variables
 
 Host_nombre = socket.gethostname()
 nombre_usuario = getpass.getuser()
@@ -25,14 +26,14 @@ def mostrar_imagen_con_texto(duration_ms=1200):
         root.configure(bg="#0f172a")
 
         # Cargar y procesar imagen si existe
-        img_path = os.path.join(os.path.dirname(__file__), 'lib', 'data', 'loading.png')
+        img_path = os.path.join(Variables.DATA_DIR, 'loading.png')
         if os.path.exists(img_path):
             img = Image.open(img_path).convert("RGBA")
             img = img.resize((width, height), Image.Resampling.LANCZOS)
             draw = ImageDraw.Draw(img)
 
             # Texto estilizado
-            font_path = os.path.join(os.path.dirname(__file__), 'lib', 'data', 'fuente', 'poppins.ttf')
+            font_path = os.path.join(Variables.DATA_DIR, 'fuente', 'poppins.ttf')
             font_title = None
             font_sub = None
             if os.path.exists(font_path):

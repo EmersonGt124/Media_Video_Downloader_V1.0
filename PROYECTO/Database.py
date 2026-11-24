@@ -1,9 +1,24 @@
 import sqlite3
 import os
+import sys
+from pathlib import Path
 from typing import List, Tuple, Dict, Any, Optional
 
-DB_DIR = os.path.join(os.path.dirname(__file__), "lib", "data")
-DB_PATH = os.path.join(DB_DIR, "downloads.db")
+def _resolve_db_path() -> Tuple[str, str]:
+    if getattr(sys, 'frozen', False):
+        if sys.platform.startswith("win"):
+            base = os.environ.get("APPDATA") or str(Path.home() / "AppData" / "Roaming")
+        elif sys.platform == "darwin":
+            base = str(Path.home() / "Library" / "Application Support")
+        else:
+            base = os.environ.get("XDG_DATA_HOME") or str(Path.home() / ".local" / "share")
+        db_dir = os.path.join(base, "MediaDownloaderPro")
+    else:
+        db_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "lib", "data")
+    os.makedirs(db_dir, exist_ok=True)
+    return db_dir, os.path.join(db_dir, "downloads.db")
+
+DB_DIR, DB_PATH = _resolve_db_path()
 
 class Database:
     @staticmethod
