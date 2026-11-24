@@ -36,8 +36,11 @@
       padding: 0;
     }
 
-    html {
+    html, body {
       scroll-behavior: smooth;
+      overflow-x: hidden;
+      width: 100%;
+      max-width: 100%;
     }
 
     body {
@@ -45,7 +48,6 @@
       color: var(--text-main);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       line-height: 1.6;
-      overflow-x: hidden;
     }
 
     a {
@@ -146,7 +148,6 @@
       white-space: nowrap;
       line-height: 1.2;
     }
-    }
 
     .btn-primary {
       background: linear-gradient(135deg, #0ea5e9, #2563eb);
@@ -175,6 +176,7 @@
       position: relative;
       padding: 80px 0 60px;
       text-align: center;
+      overflow: hidden;
     }
 
     .hero-glow {
@@ -182,7 +184,7 @@
       top: 0;
       left: 50%;
       transform: translateX(-50%);
-      width: 700px;
+      width: min(700px, 100vw);
       height: 400px;
       background: radial-gradient(circle, rgba(14, 165, 233, 0.22) 0%, transparent 70%);
       pointer-events: none;
@@ -660,8 +662,10 @@
       position: fixed;
       top: 0;
       left: 0;
-      width: 100vw;
-      height: 100vh;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
       background: rgba(5, 8, 16, 0.85);
       backdrop-filter: blur(8px);
       z-index: 999;
@@ -697,21 +701,146 @@
     /* RESPONSIVE */
     @media (max-width: 1040px) {
       .nav-links {
-        display: none;
+        display: none !important;
       }
     }
+
     @media (max-width: 768px) {
-      .grid-3 {
-        grid-template-columns: 1fr;
+      .navbar {
+        height: 64px;
+      }
+      .nav-inner {
+        gap: 12px;
+      }
+      .nav-actions .btn-secondary,
+      .nav-actions .btn-glow {
+        display: none !important;
+      }
+      .nav-actions .btn-primary {
+        padding: 7px 14px;
+        font-size: 0.82rem;
+      }
+      .container {
+        padding: 0 1rem;
+      }
+      .hero {
+        padding: 40px 0 30px;
+      }
+      .hero-glow {
+        height: 250px;
+      }
+      .pill-hero {
+        font-size: 0.78rem;
+        padding: 4px 12px;
+      }
+      .hero h1 {
+        font-size: 2.1rem;
+        line-height: 1.2;
+      }
+      .hero p {
+        font-size: 0.95rem;
+        margin-bottom: 24px;
       }
       .hero-cta {
         flex-direction: column;
+        width: 100%;
+        max-width: 380px;
+        margin: 0 auto 36px;
+        gap: 10px;
       }
       .hero-cta .btn {
         width: 100%;
+        justify-content: center;
+      }
+      .mockup-frame {
+        border-radius: 16px;
+        padding: 6px;
+      }
+      .mockup-frame img {
+        border-radius: 10px;
+      }
+      .section {
+        padding: 50px 0;
+      }
+      .section-header {
+        margin-bottom: 32px;
+      }
+      .section-title {
+        font-size: 1.65rem;
+      }
+      .grid-3 {
+        grid-template-columns: 1fr !important;
+        gap: 16px;
+      }
+      .card {
+        padding: 22px 18px;
+        border-radius: 16px;
+      }
+      .web-app-wrapper {
+        padding: 18px 14px;
+        border-radius: 18px;
+      }
+      .web-input-group {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 10px;
+        border-radius: 14px;
+      }
+      .web-input-actions {
+        display: flex;
+        gap: 8px;
+        width: 100%;
+      }
+      .web-input-actions .btn {
+        flex: 1;
+        justify-content: center;
       }
       .web-result-inner {
         grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .table-wrap {
+        border-radius: 14px;
+        -webkit-overflow-scrolling: touch;
+      }
+      table {
+        min-width: 560px;
+        font-size: 0.85rem;
+      }
+      th, td {
+        padding: 10px 14px;
+      }
+      .terminal-body {
+        font-size: 0.8rem;
+        padding: 16px 12px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .modal-card {
+        width: calc(100% - 24px);
+        max-width: 480px;
+        padding: 24px 18px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .brand {
+        font-size: 1.02rem;
+        gap: 8px;
+      }
+      .brand img {
+        width: 32px;
+        height: 32px;
+      }
+      .brand .badge-v {
+        display: none !important;
+      }
+      .platforms {
+        padding: 20px 0;
+      }
+      .platform-tags {
+        gap: 8px 14px;
+        font-size: 0.82rem;
       }
     }
   </style>
@@ -830,17 +959,21 @@
         
         <!-- BARRA DE ENLACE -->
         <div class="web-input-group">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" style="margin-left: 6px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          <input type="text" id="web-url-input" placeholder="Pega un enlace de YouTube, TikTok, Instagram, Twitter/X o SoundCloud..." onkeydown="if(event.key==='Enter') analizarEnlaceWeb();" />
+          <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" style="margin-left: 6px; flex-shrink: 0;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="web-url-input" placeholder="Pega un enlace de YouTube, TikTok, Instagram..." onkeydown="if(event.key==='Enter') analizarEnlaceWeb();" />
+          </div>
           
-          <button onclick="pegarDelPortapapeles()" class="btn btn-secondary" style="padding: 8px 14px; font-size: 0.85rem;" title="Pegar del portapapeles">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
-            <span>Pegar</span>
-          </button>
-          
-          <button id="btn-analizar-web" onclick="analizarEnlaceWeb()" class="btn btn-primary" style="padding: 8px 20px; font-size: 0.92rem;">
-            <span id="txt-analizar">Analizar</span>
-          </button>
+          <div class="web-input-actions">
+            <button onclick="pegarDelPortapapeles()" class="btn btn-secondary" style="padding: 8px 14px; font-size: 0.85rem;" title="Pegar del portapapeles">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+              <span>Pegar</span>
+            </button>
+            
+            <button id="btn-analizar-web" onclick="analizarEnlaceWeb()" class="btn btn-primary" style="padding: 8px 20px; font-size: 0.92rem;">
+              <span id="txt-analizar">Analizar</span>
+            </button>
+          </div>
         </div>
 
         <!-- CHIPS DE EJEMPLO -->
@@ -1079,6 +1212,9 @@
         <p class="section-desc">Compara Media Downloader Pro frente a los descargadores web convencionales y las apps comerciales de pago.</p>
       </div>
 
+      <div style="font-size: 0.8rem; color: #64748b; margin-bottom: 8px; text-align: right; display: none;" class="mobile-table-hint">
+        👉 Desliza con el dedo para ver la comparativa completa
+      </div>
       <div class="table-wrap">
         <table>
           <thead>
